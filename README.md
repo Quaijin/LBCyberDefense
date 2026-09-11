@@ -47,7 +47,7 @@ To host this resume online:
 
 ## 🚧 Independent Initiatives & Labs
 
-- **SileoDefense (Founder):** Independent cybersecurity practice focused on defensive security, IAM, and M365 data protection. Built with Next.js.
+- **M365 & Entra ID Security Hardening:** Defensive security framework focused on IAM, Microsoft Purview data protection, and endpoint hardening.
 - **Enterprise Proxmox Home Lab:** Windows Server DC, Active Directory, Group Policy, DNS/DHCP, and joined Windows 10/11 endpoints.
 - **Sysmon Endpoint Telemetry:** Deep process, network, and privilege escalation logging and threat detection practice.
 - **SC-900 Study Portfolio:** MkDocs & GitHub Pages documentation covering Entra ID and Conditional Access lab write-ups.
