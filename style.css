@@ -17,6 +17,68 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
 }
 
+[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-card-hover: #ffffff;
+  --border-color: rgba(14, 165, 233, 0.2);
+  --border-glow: rgba(14, 165, 233, 0.5);
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #64748b;
+  --accent-cyan: #0284c7;
+  --accent-emerald: #059669;
+  --accent-blue: #2563eb;
+  --accent-purple: #7c3aed;
+  --terminal-bar: #e2e8f0;
+}
+
+[data-theme="light"] .bg-grid-overlay {
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
+
+[data-theme="light"] .bg-radial-glow {
+  background: radial-gradient(circle, rgba(2, 132, 199, 0.08) 0%, rgba(5, 150, 105, 0.04) 50%, transparent 80%);
+}
+
+[data-theme="light"] .navbar {
+  background-color: rgba(248, 250, 252, 0.88);
+}
+
+[data-theme="light"] .tag {
+  background: rgba(15, 23, 42, 0.05);
+  border-color: rgba(15, 23, 42, 0.12);
+  color: #334155;
+}
+
+[data-theme="light"] .tag.highlight {
+  background: rgba(2, 132, 199, 0.1);
+  border-color: rgba(2, 132, 199, 0.3);
+  color: #0284c7;
+}
+
+[data-theme="light"] .card {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .card:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 0 20px rgba(2, 132, 199, 0.12);
+}
+
+[data-theme="light"] .highlight-box {
+  background: rgba(2, 132, 199, 0.06);
+  border-left-color: #0284c7;
+  color: #0f172a;
+}
+
+[data-theme="light"] .connect-card:hover {
+  background: #ffffff;
+  border-color: #0284c7;
+}
+
 * {
   margin: 0;
   padding: 0;

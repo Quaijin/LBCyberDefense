@@ -1,13 +1,48 @@
 // Online Resume JavaScript Interactions
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Dynamic copyright year
+  // 1. Theme Toggle (Dark / Light Mode)
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
+  const themeIcon = document.getElementById('theme-icon');
+  
+  // Check stored preference or system preference
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const initialTheme = savedTheme || (prefersDark ? 'dark' : 'dark'); // Default to dark cyber aesthetic
+
+  function applyTheme(theme) {
+    if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      if (themeIcon) {
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
+      }
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      if (themeIcon) {
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+      }
+    }
+    localStorage.setItem('theme', theme);
+  }
+
+  applyTheme(initialTheme);
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      applyTheme(isLight ? 'dark' : 'light');
+    });
+  }
+
+  // 2. Dynamic copyright year
   const currentYearElement = document.getElementById('current-year');
   if (currentYearElement) {
     currentYearElement.textContent = new Date().getFullYear();
   }
 
-  // 2. Print Resume Handler
+  // 3. Print Resume Handler
   const printBtn = document.getElementById('print-resume-btn');
   if (printBtn) {
     printBtn.addEventListener('click', (e) => {
