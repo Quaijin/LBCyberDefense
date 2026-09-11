@@ -42,14 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
     currentYearElement.textContent = new Date().getFullYear();
   }
 
-  // 3. Print Resume Handler
-  const printBtn = document.getElementById('print-resume-btn');
-  if (printBtn) {
-    printBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.print();
-    });
-  }
 
   // 3. Smooth active link highlighting on scroll
   const sections = document.querySelectorAll('section[id]');

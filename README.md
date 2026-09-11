@@ -12,7 +12,7 @@
 This repository hosts my live interactive cybersecurity resume and portfolio, designed for GitHub Pages.
 
 - **Live Resume Website:** [View Resume on GitHub Pages](https://quaijin.github.io/LBCyberDefense/)
-- Built with responsive semantic HTML5, cyber-themed dark CSS styling, and print-to-PDF support.
+- Built with responsive semantic HTML5, cyber-themed dark/light mode styling, and interactive navigation.
 
 ---
 
