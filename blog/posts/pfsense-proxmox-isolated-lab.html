@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pfSense + Proxmox: Building an Isolated Virtual Lab Network | Luis Baldera</title>
+  <meta name="description" content="Step-by-step home lab guide on isolating a Proxmox virtual environment using pfSense, virtual Linux bridges (vmbr1), DHCP routing, and WAN hardening.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <!-- Background Decorations -->
+  <div class="bg-grid-overlay"></div>
+  <div class="bg-radial-glow"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="../../index.html" class="nav-brand" title="Return to Home">
+        <span class="nav-brand-icon"><i class="fa-solid fa-shield-halved"></i></span>
+        <span>lbcyberdefense</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../../index.html#about">About</a></li>
+        <li><a href="../../index.html#skills">Competencies</a></li>
+        <li><a href="../../index.html#experience">Experience</a></li>
+        <li><a href="../../index.html#initiatives">Projects &amp; Labs</a></li>
+        <li><a href="../index.html" style="color: var(--accent-cyan); font-weight: 600;">Blog &amp; Write-ups</a></li>
+        <li><a href="../../index.html#education">Education &amp; Certs</a></li>
+        <li><a href="../../index.html#connect">Connect</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button id="theme-toggle-btn" class="btn btn-outline btn-sm" aria-label="Toggle light and dark mode" title="Toggle theme">
+          <i id="theme-icon" class="fa-solid fa-sun"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="article-content">
+      <!-- Breadcrumb -->
+      <div style="margin-top: 2rem; font-family: var(--font-mono); font-size: 0.85rem;">
+        <a href="../index.html" style="color: var(--accent-cyan); text-decoration: none;">
+          <i class="fa-solid fa-arrow-left"></i> Back to All Lab Write-ups
+        </a>
+      </div>
+
+      <!-- Article Header -->
+      <header class="blog-header">
+        <div class="status-badge" style="margin-bottom: 0.8rem;">
+          <span class="pulse-dot"></span>
+          <span>NETWORK SEGMENTATION &amp; HOMELAB FIREWALL</span>
+        </div>
+        <h1 style="font-size: 2.35rem; line-height: 1.25; font-weight: 800; margin-bottom: 0.75rem;">
+          pfSense + Proxmox: Building an Isolated Virtual Lab Network
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">
+          Deploying a dedicated pfSense virtual gateway on Proxmox to create an air-gapped sandbox network for Active Directory, domain controllers, and testing endpoints without touching your home LAN.
+        </p>
+
+        <div class="blog-meta">
+          <span><i class="fa-regular fa-calendar"></i> HomeLab Knowledge Base</span>
+          <span><i class="fa-regular fa-clock"></i> 8 min read</span>
+          <span><i class="fa-solid fa-tag" style="color: var(--accent-cyan);"></i> pfSense, Proxmox VE, Firewall, Network Segmentation</span>
+        </div>
+      </header>
+
+      <!-- Main Article Body -->
+      <div class="card" style="margin-bottom: 2.5rem; padding: 2rem;">
+        <p>
+          This guide outlines the process of isolating a Proxmox lab environment by deploying a dedicated <strong>pfSense virtual machine (VM)</strong>. This architecture keeps your home ISP-managed devices on a standard bridge while creating an "air-gapped" virtual bubble for your lab VMs.
+        </p>
+
+        <h2>Phase 1: Create the Isolated Network (Bridge)</h2>
+        <p>
+          This bridge acts as a virtual "switch" that is not connected to any physical hardware ports, ensuring your lab VMs stay strictly off your main home network.
+        </p>
+
+        <ol>
+          <li>Log in to your Proxmox Web UI.</li>
+          <li>Navigate to <strong>Datacenter &rarr; [Your Node] &rarr; System &rarr; Network</strong>.</li>
+          <li>Click <strong>Create &rarr; Linux Bridge</strong>.</li>
+          <li><strong>Name:</strong> <code>vmbr1</code></li>
+          <li><strong>Bridge ports:</strong> Leave <strong>BLANK</strong> (this is crucial for complete network isolation).</li>
+          <li>Click <strong>Create</strong> and then <strong>Apply Configuration</strong>.</li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/pfSense%20+Proxmox-1783215401839.webp" alt="Proxmox Linux Bridge Configuration">
+          <div class="article-image-caption">Figure 1: Creating the isolated vmbr1 Linux Bridge in Proxmox</div>
+        </div>
+
+        <ul>
+          <li><strong><code>vmbr0</code> (Management Bridge):</strong> Connected to the physical NIC, handles Proxmox PVE GUI, SSH, and host management traffic.</li>
+          <li><strong><code>vmbr1</code> (Internal Bridge):</strong> Isolated virtual switch with no physical slave port, handling only guest lab traffic.</li>
+        </ul>
+
+        <div class="highlight-box">
+          <strong>Linux Bridge Settings Summary:</strong>
+          <ul style="margin: 0.5rem 0 0 1.25rem;">
+            <li><strong>Name:</strong> <code>vmbr1</code></li>
+            <li><strong>Bridge ports:</strong> [Leave blank]</li>
+            <li><strong>IPv4/CIDR:</strong> [Leave blank]</li>
+            <li><strong>IPv6/CIDR:</strong> [Leave blank]</li>
+            <li><strong>VLAN aware:</strong> [UNCHECKED]</li>
+          </ul>
+        </div>
+
+        <h2>Phase 2: Deploy the pfSense VM</h2>
+        <ol>
+          <li>
+            <strong>Download ISO:</strong> Fetch the latest <a href="https://www.pfsense.org/download/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan);">pfSense CE ISO</a> and upload it to your Proxmox <code>local</code> storage.
+          </li>
+          <li>
+            <strong>Create VM:</strong> Click <strong>Create VM</strong> in the top-right toolbar:
+            <ul>
+              <li><strong>General:</strong> Name it <code>pfSense-Gateway</code>.</li>
+              <li><strong>OS:</strong> Select the pfSense ISO. Guest OS Type: <strong>Other</strong>.</li>
+              <li><strong>System:</strong> Default settings (Keep QEMU Agent enabled).</li>
+              <li><strong>Disks:</strong> 32GB+ recommended (Enable <strong>IO Thread</strong> for improved I/O throughput).</li>
+              <li><strong>CPU:</strong> 2 vCPUs are sufficient for lab workloads.</li>
+              <li><strong>Memory:</strong> 2GB to 4GB RAM.</li>
+              <li>
+                <strong>Network:</strong>
+                <ul>
+                  <li><strong>NIC 1 (WAN):</strong> Select <code>vmbr0</code> (Your uplink bridge to the ISP network).</li>
+                  <li><strong>Add Network Device:</strong> Click <strong>Add &rarr; Network Device</strong>.</li>
+                  <li><strong>NIC 2 (LAN):</strong> Select <code>vmbr1</code> (Your new isolated bridge).</li>
+                  <li><strong>Model:</strong> Set both NICs to <code>VirtIO (paravirtualized)</code>. Uncheck "Firewall" on these virtual NICs to prevent Proxmox pve-firewall rule interference.</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/pfSense%20+Proxmox-1783215600694.webp" alt="pfSense Virtual Machine Hardware Overview">
+          <div class="article-image-caption">Figure 2: Completed pfSense VM hardware configuration in Proxmox</div>
+        </div>
+
+        <h2>Phase 3: Install &amp; Assign Interfaces</h2>
+        <ol>
+          <li>Start the <code>pfSense-Gateway</code> VM and launch the <strong>Console</strong>.</li>
+          <li>Follow the installation prompts (Accept, Install, ZFS Auto-Partitioning).</li>
+          <li>
+            <strong>Interface Assignment:</strong> Once installed and rebooted, console prompts will request interface assignments:
+            <ul>
+              <li><strong>VLANs:</strong> Type <code>n</code> and hit Enter.</li>
+              <li><strong>WAN:</strong> Enter <code>vtnet0</code> (bound to <code>vmbr0</code>).</li>
+              <li><strong>LAN:</strong> Enter <code>vtnet1</code> (bound to <code>vmbr1</code>).</li>
+              <li>Type <code>y</code> to confirm assignments.</li>
+            </ul>
+          </li>
+          <li>Once assigned, note the <strong>LAN IP</strong> (default gateway is typically <code>192.168.1.1</code>).</li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/pfSense%20+Proxmox-1783215357572.webp" alt="pfSense Interface Assignment in Console">
+          <div class="article-image-caption">Figure 3: Console interface assignments for vtnet0 (WAN) and vtnet1 (LAN)</div>
+        </div>
+
+        <h2>Phase 4: Configure the Lab &amp; Route Endpoints</h2>
+        <p>Now we attach target lab machines (such as our Active Directory Domain Controller and Windows 11 client) to the isolated network:</p>
+
+        <ol>
+          <li>Shut down your target lab VM (e.g., Domain Controller or Windows 11 client).</li>
+          <li>In Proxmox, select the VM &rarr; <strong>Hardware &rarr; Network Device &rarr; Edit</strong>.</li>
+          <li>Change the bridge from <code>vmbr0</code> to <code>vmbr1</code>.</li>
+          <li>Power the VM back on. It will immediately request an IP lease from the <strong>pfSense DHCP server</strong> rather than your home router.</li>
+          <li>
+            <strong>Access:</strong> From your Windows 11 lab VM, navigate to <code>https://192.168.1.1</code> in your browser to access the pfSense Web GUI.
+          </li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/pfSense%20+Proxmox-1783215678168.webp" alt="Windows 11 Client connected to vmbr1">
+          <div class="article-image-caption">Figure 4: Windows 11 client receiving DHCP IP lease on vmbr1 via pfSense</div>
+        </div>
+
+        <div class="article-image-container">
+          <img src="../attachments/pfSense%20+Proxmox-1783215722830.webp" alt="DC01 Network Hardware in Proxmox">
+          <div class="article-image-caption">Figure 5: Active Directory Domain Controller (DC01) hardware reassigned to vmbr1</div>
+        </div>
+
+        <div class="article-image-container">
+          <img src="../attachments/pfSense%20+Proxmox-1783216115433.webp" alt="DC01 Network Configuration">
+          <div class="article-image-caption">Figure 6: DC01 operating inside vmbr1 and routed through pfSense</div>
+        </div>
+
+        <div class="article-image-container">
+          <img src="../attachments/pfSense%20+Proxmox-1783216234145.webp" alt="Windows 11 DNS Configuration">
+          <div class="article-image-caption">Figure 7: Windows 11 Client configured with DC01 (192.168.1.101) as primary DNS for Active Directory domain resolution</div>
+        </div>
+
+        <div class="article-image-container">
+          <img src="../attachments/pfSense%20+Proxmox-1783216455108.webp" alt="pfSense WebGUI Dashboard">
+          <div class="article-image-caption">Figure 8: Accessing pfSense WebGUI securely from inside the LAN segment</div>
+        </div>
+
+        <h3>NAT Outbound Verification</h3>
+        <p>
+          Verify that <strong>Firewall &rarr; NAT &rarr; Outbound</strong> is set to <em>"Automatic outbound NAT rule generation"</em>. This ensures all guest VMs on <code>vmbr1</code> receive masqueraded internet access while remaining completely invisible and unreachable from the external home network.
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/pfSense%20+%20Proxmox-1783216728097.webp" alt="pfSense Outbound NAT Rules">
+          <div class="article-image-caption">Figure 9: Automatic Outbound NAT configuration in pfSense</div>
+        </div>
+
+        <h2>Phase 5: Security Hardening – Disabling WAN Management</h2>
+        <p>
+          To ensure management interfaces are never exposed to the ISP side:
+        </p>
+
+        <ol>
+          <li>Navigate to <strong>System &rarr; Advanced &rarr; Admin Access</strong>.</li>
+          <li>Locate the <strong>WebGUI redirect</strong> section and check <em>"Disable webConfigurator redirect rule"</em>.</li>
+          <li>
+            Navigate to <strong>Firewall &rarr; Rules &rarr; WAN</strong>.
+          </li>
+          <li>
+            Review WAN rules: If any rule permits <strong>TCP/443</strong> (HTTPS) or <strong>TCP/80</strong> (HTTP) from "Any" source to "WAN Address", <strong>disable or delete it immediately</strong>.
+          </li>
+          <li>
+            By default, pfSense blocks all unsolicited WAN traffic, but explicit verification guarantees your firewall interface cannot be reached from outside the lab bubble.
+          </li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/pfSense%20+%20Proxmox-1783217022590.webp" alt="Firewall Rules on WAN interface">
+          <div class="article-image-caption">Figure 10: WAN Firewall rules verified clean of any exposed administrative ports</div>
+        </div>
+
+        <div class="obsidian-callout tip">
+          <div class="obsidian-callout-title">
+            <i class="fa-solid fa-shield-check" style="color: var(--accent-emerald);"></i> Note on Anti-Lockout Rule
+          </div>
+          <p>
+            pfSense includes an <strong>Anti-Lockout Rule</strong> enabled by default on the <strong>LAN</strong> interface. This rule prevents administrators from accidentally locking themselves out of the WebGUI from inside <code>vmbr1</code>.
+          </p>
+        </div>
+
+        <div class="highlight-box" style="margin-top: 2rem;">
+          <strong>Recommended Video Walkthrough:</strong><br>
+          <a href="https://www.youtube.com/watch?v=pTLeKrnSHw8" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan);">
+            <i class="fa-brands fa-youtube" style="color: #ef4444;"></i> Install pfSense on Proxmox Guide
+          </a> — Demonstrates initial bridge provisioning and interface bindings.
+        </div>
+      </div>
+
+      <!-- Footer navigation -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 3rem 0;">
+        <a href="../index.html" class="btn btn-outline">
+          <i class="fa-solid fa-arrow-left"></i> All Articles
+        </a>
+        <a href="caddy-tls-reverse-proxy.html" class="btn btn-outline">
+          Next Lab: Caddy TLS <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© <span id="current-year">2026</span> Luis Baldera. Hosted securely with GitHub Pages.</p>
+      <p style="margin-top: 0.3rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);">
+        Data Security • IAM • Microsoft Defender ATP • Entra ID • M365 Defensive Operations
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../script.js"></script>
+</body>
+</html>

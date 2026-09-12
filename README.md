@@ -59,10 +59,14 @@ To host this resume online:
 Directly integrated with the resume is a technical blog publishing real lab documentation straight from my Obsidian vault:
 
 - **Blog Index:** [Security Labs & Knowledge Base](blog/index.html)
-- **First Featured Lab:** [Caddy as a TLS / HTTPS Reverse Proxy for Local Services](blog/posts/caddy-tls-reverse-proxy.html)
+- **Lab 1:** [Caddy as a TLS / HTTPS Reverse Proxy for Local Services](blog/posts/caddy-tls-reverse-proxy.html)
   - Reverse proxy configuration for CasaOS & local containers.
   - Port conflict resolution (reclaiming port 443).
   - Internal Certificate Authority (CA) root cert distribution for Windows and Linux trust stores.
+- **Lab 2:** [pfSense + Proxmox: Building an Isolated Virtual Lab Network](blog/posts/pfsense-proxmox-isolated-lab.html)
+  - Dedicated virtual firewall gateway on Proxmox VE.
+  - Air-gapped Linux Bridge (`vmbr1`) for isolated Active Directory & Windows 11 workloads.
+  - Automatic Outbound NAT and WAN administrative hardening.
 
 ---
 
