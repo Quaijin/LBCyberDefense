@@ -54,6 +54,18 @@ To host this resume online:
 
 ---
 
+## 📚 Technical Blog & Homelab Knowledge Base
+
+Directly integrated with the resume is a technical blog publishing real lab documentation straight from my Obsidian vault:
+
+- **Blog Index:** [Security Labs & Knowledge Base](blog/index.html)
+- **First Featured Lab:** [Caddy as a TLS / HTTPS Reverse Proxy for Local Services](blog/posts/caddy-tls-reverse-proxy.html)
+  - Reverse proxy configuration for CasaOS & local containers.
+  - Port conflict resolution (reclaiming port 443).
+  - Internal Certificate Authority (CA) root cert distribution for Windows and Linux trust stores.
+
+---
+
 ## 📫 Connect & Profiles
 
 - **LinkedIn:** [linkedin.com/in/luis-baldera](https://www.linkedin.com/in/luis-baldera/)

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caddy as a TLS / HTTPS Reverse Proxy for Local Services | Luis Baldera</title>
+  <meta name="description" content="Step-by-step home lab write-up: Configuring Caddy as a TLS/HTTPS reverse proxy for local internal services, CasaOS, custom root CA certificates, and DNS resolution.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <!-- Background Decorations -->
+  <div class="bg-grid-overlay"></div>
+  <div class="bg-radial-glow"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="../../index.html" class="nav-brand">
+        <span>~/luis-baldera/cyber-defense</span><span class="cursor">_</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../../index.html#about">About</a></li>
+        <li><a href="../../index.html#skills">Competencies</a></li>
+        <li><a href="../../index.html#experience">Experience</a></li>
+        <li><a href="../../index.html#initiatives">Labs</a></li>
+        <li><a href="../index.html" style="color: var(--accent-cyan); font-weight: 600;">Blog & Write-ups</a></li>
+        <li><a href="../../index.html#connect">Connect</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button id="theme-toggle-btn" class="btn btn-outline btn-sm" aria-label="Toggle light and dark mode" title="Toggle theme">
+          <i id="theme-icon" class="fa-solid fa-sun"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="article-content">
+      <!-- Breadcrumb -->
+      <div style="margin-top: 2rem; font-family: var(--font-mono); font-size: 0.85rem;">
+        <a href="../index.html" style="color: var(--accent-cyan); text-decoration: none;">
+          <i class="fa-solid fa-arrow-left"></i> Back to All Lab Write-ups
+        </a>
+      </div>
+
+      <!-- Article Header -->
+      <header class="blog-header">
+        <div class="status-badge" style="margin-bottom: 0.8rem;">
+          <span class="pulse-dot"></span>
+          <span>HOMELAB SECURITY &amp; PKI</span>
+        </div>
+        <h1 style="font-size: 2.35rem; line-height: 1.25; font-weight: 800; margin-bottom: 0.75rem;">
+          Caddy as a TLS / HTTPS Reverse Proxy for Local Services
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">
+          Implementing automatic TLS certificates, internal Certificate Authorities (CA), and DNS overrides for internal home lab services like CasaOS.
+        </p>
+
+        <div class="blog-meta">
+          <span><i class="fa-regular fa-calendar"></i> HomeLab Knowledge Base</span>
+          <span><i class="fa-regular fa-clock"></i> 7 min read</span>
+          <span><i class="fa-solid fa-tag" style="color: var(--accent-cyan);"></i> Reverse Proxy, TLS, PKI, Linux</span>
+        </div>
+      </header>
+
+      <!-- Main Article Body -->
+      <div class="card" style="margin-bottom: 2.5rem; padding: 2rem;">
+        <p>
+          We will use <strong>Caddy</strong> as a TLS/HTTPS reverse proxy in front of services like <strong>CasaOS</strong> or any other local web applications. Here’s how that works:
+        </p>
+
+        <h3><i class="fa-solid fa-lock"></i> How Caddy Provides TLS</h3>
+        <ul>
+          <li><strong>Automatic HTTPS</strong>: Caddy can automatically obtain and renew certificates from Let’s Encrypt or ZeroSSL for public domains.</li>
+          <li><strong>Local/Internal Services</strong>: For apps that don’t have public DNS names (like CasaOS on your local lab network), Caddy can act as a <strong>reverse proxy</strong> and provide TLS for them.</li>
+          <li><strong>Local CA</strong>: Caddy includes a built-in Certificate Authority (CA) for issuing certificates to internal hostnames or IPs, so you still get HTTPS even without a public domain.</li>
+        </ul>
+
+        <div class="highlight-box">
+          <strong>Reference Documentation:</strong><br>
+          <a href="https://github.com/caddyserver/caddy" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan);">
+            caddyserver/caddy: Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS
+          </a>
+        </div>
+
+        <h2>Step 1 – Installing Caddy</h2>
+        <p>
+          In this environment, CasaOS is running on Ubuntu 24.04/26.04 locally at <code>10.0.0.203:90</code>.
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Caddy-1787757678951.webp" alt="CasaOS Dashboard on Port 90">
+          <div class="article-image-caption">Figure 1: CasaOS local web interface</div>
+        </div>
+
+        <p>SSH into the Ubuntu server and install Caddy from the official repository:</p>
+
+        <pre><code>sudo apt update
+sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo tee /etc/apt/trusted.gpg.d/caddy-stable.asc
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo apt update
+sudo apt install caddy</code></pre>
+
+        <div class="article-image-container">
+          <img src="../attachments/Caddy%20for%20TLS-1787751904926.webp" alt="Installing Caddy on Ubuntu Server">
+          <div class="article-image-caption">Figure 2: Caddy installation package manager output</div>
+        </div>
+
+        <h2>Step 2 – Create Caddyfile</h2>
+        <p>
+          The Caddyfile will host reverse proxy rules for CasaOS and any auxiliary containerized services running on the host:
+        </p>
+        <pre><code>/etc/caddy/Caddyfile</code></pre>
+
+        <div class="article-image-container">
+          <img src="../attachments/Caddy%20for%20TLS-1787751933680.webp" alt="Editing /etc/caddy/Caddyfile">
+          <div class="article-image-caption">Figure 3: Initial Caddyfile configuration</div>
+        </div>
+
+        <p>Added reverse proxy entries mapping internal hostnames to specific internal service ports:</p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Caddy%20for%20TLS-1787752068447.webp" alt="Configured Caddyfile Rules">
+          <div class="article-image-caption">Figure 4: Custom domain entries inside Caddyfile</div>
+        </div>
+
+        <div class="obsidian-callout warning">
+          <div class="obsidian-callout-title">
+            <i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b;"></i> Port Conflict Troubleshooting
+          </div>
+          <p>
+            Notice there was an Nginx service previously installed as a Docker container binding port 80. By default, CasaOS runs on port 80, but due to this conflict, it was moved to port 90.
+          </p>
+          <p>
+            When starting Caddy with <code>sudo systemctl start caddy</code>, it failed because port 443 was also occupied by the legacy Nginx container. Stopping and removing the container released port 443, enabling Caddy to start immediately.
+          </p>
+        </div>
+
+        <div class="article-image-container">
+          <img src="../attachments/Caddy%20for%20TLS-1787752329110.webp" alt="Caddy systemctl status verification">
+          <div class="article-image-caption">Figure 5: Caddy service active and running</div>
+        </div>
+
+        <h2>Step 3 – DNS Configuration</h2>
+        <p>
+          To allow client machines to resolve <code>casaos.local</code> to the server, configure the hosts file:
+        </p>
+        <ul>
+          <li>Linux / macOS: <code>/etc/hosts</code></li>
+          <li>Windows: <code>C:\Windows\System32\drivers\etc\hosts</code></li>
+        </ul>
+
+        <div class="obsidian-callout tip">
+          <div class="obsidian-callout-title">
+            <i class="fa-solid fa-lightbulb" style="color: var(--accent-emerald);"></i> Tip: Editing hosts file on Windows
+          </div>
+          <p>
+            Open Notepad as Administrator, navigate to <code>C:\Windows\System32\drivers\etc\hosts</code> (ensure "All Files *.*" is selected in file dialog), add the record, and save.
+          </p>
+        </div>
+
+        <pre><code>10.0.0.203   casaos.local</code></pre>
+
+        <h2>Step 4 – Certificate Authority (CA) Configuration</h2>
+        <p>Export the internal Root Certificate generated by Caddy on the Ubuntu host:</p>
+
+        <pre><code>sudo cat /var/lib/caddy/.local/share/caddy/pki/authorities/local/root.crt > ~/caddy-root.crt</code></pre>
+
+        <p>
+          The certificate must be imported into the trusted store of any client machine accessing the services. The easiest transfer method is downloading it directly via the CasaOS file manager GUI:
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Caddy%20for%20TLS-1787752702614.webp" alt="Exporting Root Certificate">
+          <div class="article-image-caption">Figure 6: Exporting caddy-root.crt</div>
+        </div>
+
+        <h3>Importing into Windows Certificate Manager (certmgr.msc)</h3>
+        <ol>
+          <li>Press <kbd>Win + R</kbd>, type <code>certmgr.msc</code>, and press Enter.</li>
+          <li>In the left pane, expand <strong>Trusted Root Certification Authorities &rarr; Certificates</strong>.</li>
+          <li>Right-click <strong>Certificates &rarr; All Tasks &rarr; Import</strong>.</li>
+          <li>Browse to the downloaded <code>caddy-root.crt</code> file.</li>
+          <li>Complete the wizard, ensuring it is placed in <strong>Trusted Root Certification Authorities</strong>.</li>
+        </ol>
+
+        <p>Reload Caddy after any additions or changes:</p>
+        <pre><code>sudo systemctl reload caddy</code></pre>
+
+        <p>You can now navigate from your client browser directly to <code>https://casaos.local</code>.</p>
+
+        <p>If you encounter a browser cache warning during the first connection:</p>
+        <div class="article-image-container">
+          <img src="../attachments/Caddy%20for%20TLS-1787756055573.webp" alt="Initial Certificate Warning">
+          <div class="article-image-caption">Figure 7: Initial certificate cache alert</div>
+        </div>
+
+        <p>Simply restarting the browser loads the newly imported root certificate:</p>
+        <div class="article-image-container">
+          <img src="../attachments/Caddy%20for%20TLS-1787756092155.webp" alt="Valid Trusted SSL Connection">
+          <div class="article-image-caption">Figure 8: Trusted HTTPS lock verified in browser address bar</div>
+        </div>
+
+        <p>All auxiliary internal services requiring secure HTTPS contexts now function seamlessly:</p>
+        <div class="article-image-container">
+          <img src="../attachments/Caddy%20for%20TLS-1787757341128.webp" alt="Internal Service 1 with TLS">
+        </div>
+        <div class="article-image-container">
+          <img src="../attachments/Caddy%20for%20TLS-1787757353526.webp" alt="Internal Service 2 with TLS">
+        </div>
+        <div class="article-image-container">
+          <img src="../attachments/Caddy%20for%20TLS-1787757375747.webp" alt="Internal Service 3 with TLS">
+          <div class="article-image-caption">Figure 9: Auxiliary local web applications operating over secure TLS</div>
+        </div>
+
+        <h3>DNS &amp; CA Configuration for Linux Client Machines</h3>
+        <p><strong>1. Host file configuration:</strong></p>
+        <pre><code>sudo nano /etc/hosts
+
+# Add service hostnames:
+10.0.0.203   casaos.local
+10.0.0.203   vaultwarden.local
+10.0.0.203   actual.local
+10.0.0.203   karakeep.local
+10.0.0.203   nginx.local</code></pre>
+
+        <p><strong>2. Root Certificate Trust Store:</strong></p>
+        <pre><code># Copy cert into system trust anchor directory:
+sudo cp ~/caddy-root.crt /etc/pki/ca-trust/source/anchors/
+
+# Update the system trust database:
+sudo update-ca-trust extract</code></pre>
+
+        <p><strong>3. Test Connection:</strong></p>
+        <pre><code>https://casaos.local</code></pre>
+
+        <h2>Important Notes &amp; Browser Considerations</h2>
+        <ul>
+          <li>
+            <strong>Mozilla Firefox</strong> maintains its own internal CA store separate from the OS. To import:
+            <br>
+            Go to <em>Settings &rarr; Privacy &amp; Security &rarr; Certificates &rarr; View Certificates &rarr; Authorities &rarr; Import</em>, select <code>caddy-root.crt</code>, and check "Trust this CA to identify websites".
+          </li>
+          <li>
+            <strong>Chromium / Chrome / Edge on Linux (Fedora/RHEL/Ubuntu)</strong> utilizes the system trust store, so the <code>update-ca-trust</code> or <code>update-ca-certificates</code> command is sufficient.
+          </li>
+        </ul>
+
+        <div class="article-image-container" style="margin-top: 2rem;">
+          <img src="../attachments/Caddy-1787980665952.webp" alt="Final Architecture Diagram">
+          <div class="article-image-caption">Figure 10: Complete Homelab TLS Architecture Diagram</div>
+        </div>
+      </div>
+
+      <!-- Footer navigation -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 3rem 0;">
+        <a href="../index.html" class="btn btn-outline">
+          <i class="fa-solid fa-arrow-left"></i> All Articles
+        </a>
+        <a href="../../index.html#connect" class="btn btn-primary">
+          <i class="fa-solid fa-envelope"></i> Contact Luis
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© <span id="current-year">2026</span> Luis Baldera. Hosted securely with GitHub Pages.</p>
+      <p style="margin-top: 0.3rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);">
+        Data Security • IAM • Microsoft Defender ATP • Entra ID • M365 Defensive Operations
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../script.js"></script>
+</body>
+</html>

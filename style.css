@@ -700,3 +700,191 @@ footer {
     flex: 1 1 100%;
   }
 }
+
+/* ===================================================
+   Blog & Article Formatting (Obsidian-Style Rendering)
+   =================================================== */
+.blog-header {
+  padding: 3.5rem 0 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 2.5rem;
+}
+
+.blog-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin-top: 1rem;
+}
+
+.blog-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.article-content {
+  max-width: 840px;
+  margin: 0 auto;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--text-main);
+}
+
+.article-content h2 {
+  font-size: 1.65rem;
+  font-weight: 700;
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+}
+
+[data-theme="light"] .article-content h2 {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.article-content h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 1.8rem 0 0.8rem;
+  color: var(--accent-cyan);
+}
+
+.article-content h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.6rem;
+  color: var(--accent-emerald);
+}
+
+.article-content p {
+  margin-bottom: 1.25rem;
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .article-content p {
+  color: #334155;
+}
+
+.article-content ul, 
+.article-content ol {
+  margin: 0 0 1.5rem 1.5rem;
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .article-content ul,
+[data-theme="light"] .article-content ol {
+  color: #334155;
+}
+
+.article-content li {
+  margin-bottom: 0.5rem;
+}
+
+.article-content pre {
+  background-color: #050811;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.1rem 1.25rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin: 1.25rem 0 1.5rem;
+  position: relative;
+}
+
+[data-theme="light"] .article-content pre {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.article-content code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: rgba(56, 189, 248, 0.1);
+  color: var(--accent-cyan);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+}
+
+[data-theme="light"] .article-content code {
+  background: rgba(2, 132, 199, 0.1);
+  color: #0369a1;
+}
+
+.article-content pre code {
+  background: transparent;
+  color: #e2e8f0;
+  padding: 0;
+  border-radius: 0;
+}
+
+[data-theme="light"] .article-content pre code {
+  color: #0f172a;
+}
+
+/* Obsidian Callout Styles */
+.obsidian-callout {
+  border-left: 4px solid var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.08);
+  padding: 1rem 1.25rem;
+  border-radius: 0 8px 8px 0;
+  margin: 1.5rem 0;
+}
+
+.obsidian-callout.tip {
+  border-left-color: var(--accent-emerald);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.obsidian-callout.warning {
+  border-left-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.obsidian-callout-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-main);
+}
+
+/* Responsive Image Containers */
+.article-image-container {
+  margin: 1.75rem 0;
+  text-align: center;
+}
+
+.article-image-container img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+[data-theme="light"] .article-image-container img {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+.article-image-container img:hover {
+  transform: scale(1.01);
+}
+
+.article-image-caption {
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  margin-top: 0.5rem;
+}
+
