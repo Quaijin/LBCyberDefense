@@ -11,14 +11,14 @@
             "id": "99aa0957f7220120",
             "type": "leaf",
             "state": {
-              "type": "split-diff-view",
+              "type": "markdown",
               "state": {
-                "aFile": ".obsidian/workspace.json",
-                "bFile": ".obsidian/workspace.json",
-                "aRef": ""
+                "file": "README.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "diff",
-              "title": "Diff: workspace.json  (Working Tree)"
+              "icon": "lucide-file",
+              "title": "README"
             }
           }
         ]
@@ -99,6 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -210,11 +211,11 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "99aa0957f7220120",
+  "active": "beeac1051fba443d",
   "lastOpenFiles": [
+    "gemini-scribe/Prompts/example-expert.md",
     "gemini-scribe/AGENTS.md",
     "gemini-scribe/Agent-Sessions/2026-09-12 Git Exclude Gemini Scribe Folder.md",
-    "gemini-scribe/Prompts/example-expert.md",
     "gemini-scribe/example-prompts.json",
     "README.md",
     "gemini-scribe/Scheduled-Tasks/scheduled-tasks-state.json",
