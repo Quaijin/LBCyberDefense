@@ -653,6 +653,104 @@ section {
   text-align: center;
 }
 
+/* Resume */
+.resume-header {
+  padding: 4rem 0 2rem;
+}
+
+.resume-contact-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.resume-contact-link {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.resume-contact-cyan,
+.section-icon-cyan {
+  color: var(--accent-cyan);
+}
+
+.resume-contact-purple {
+  color: var(--accent-purple);
+}
+
+.resume-summary {
+  padding-top: 1rem;
+}
+
+.resume-certification {
+  margin-bottom: 1.25rem;
+}
+
+.resume-inline-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.resume-status-tag {
+  font-size: 0.75rem;
+}
+
+.resume-status-scheduled {
+  border-color: var(--accent-emerald);
+  color: var(--accent-emerald);
+}
+
+.resume-certification-description {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.resume-degree {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.resume-degree-specialization {
+  color: var(--accent-cyan);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.resume-school {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin-top: 0.35rem;
+}
+
+.resume-credential {
+  margin-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+}
+
+.resume-credential-icon {
+  color: var(--accent-emerald);
+}
+
+.resume-actions {
+  margin: 4rem 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 /* Connect / Contact */
 .connect-links {
   display: flex;
