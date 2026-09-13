@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Group Policy Configuration &amp; Testing | Luis Baldera</title>
+  <meta name="description" content="Advanced Group Policy Object (GPO) setup, testing, and troubleshooting for Windows Server domain environments. Learn to configure baselines, drive mappings, and security policies.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../favicon.png">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <!-- Background Decorations -->
+  <div class="bg-grid-overlay"></div>
+  <div class="bg-radial-glow"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="../../index.html" class="nav-brand" title="Return to Home">
+        <span class="nav-brand-icon"><img src="../../favicon.png" alt="Logo" style="width: 20px; height: 20px;"></span>
+        <span>lbcyberdefense</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../../index.html">Portfolio &amp; Labs</a></li>
+        <li><a href="../index.html" class="nav-link-active">Blog &amp; Knowledge Base</a></li>
+        <li><a href="../../resume.html">Resume</a></li>
+        <li><a href="../../index.html#connect">Connect</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button id="theme-toggle-btn" class="btn btn-outline btn-sm" aria-label="Toggle light and dark mode" title="Toggle theme">
+          <i id="theme-icon" class="fa-solid fa-sun"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="article-content">
+      <!-- Breadcrumb -->
+      <div style="margin-top: 2rem; font-family: var(--font-mono); font-size: 0.85rem;">
+        <a href="../index.html" style="color: var(--accent-cyan); text-decoration: none;">
+          <i class="fa-solid fa-arrow-left"></i> Back to All Lab Write-ups
+        </a>
+      </div>
+
+      <!-- Article Header -->
+      <header class="blog-header">
+        <div class="status-badge" style="margin-bottom: 0.8rem;">
+          <span class="pulse-dot"></span>
+          <span>GROUP POLICY &amp; WINDOWS SERVER CONFIGURATION</span>
+        </div>
+        <h1 style="font-size: 2.35rem; line-height: 1.25; font-weight: 800; margin-bottom: 0.75rem;">
+          Group Policy Configuration &amp; Testing Guide
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">
+          Create and link Group Policy Objects (GPOs) for computer baselines, user preferences, and drive mappings. Learn to test policy application and troubleshoot common issues.
+        </p>
+
+        <div class="blog-meta">
+          <span><i class="fa-regular fa-calendar"></i> HomeLab Knowledge Base</span>
+          <span><i class="fa-regular fa-clock"></i> 7 min read</span>
+          <span><i class="fa-solid fa-tag" style="color: var(--accent-cyan);"></i> Group Policy, GPO, Windows Server, GPRESULT, Security Baselines</span>
+        </div>
+      </header>
+
+      <!-- Main Article Body -->
+      <div class="card" style="margin-bottom: 2.5rem; padding: 2rem;">
+        <p>
+          This guide walks through creating, linking, and testing Group Policy Objects (GPOs) in your Active Directory domain. You'll learn how to configure security baselines, user preferences, and drive mappings while troubleshooting common issues.
+        </p>
+
+        <h2>Step 1: Create and Link Computer Baseline GPO</h2>
+        <p>
+          We'll create a GPO targeted at workstations in a specific Organizational Unit (OU).
+        </p>
+
+        <p>
+          <strong>Target:</strong> <code>Workstations &gt; NYC</code> (or parent <code>Workstations</code> for domain-wide application)
+        </p>
+
+        <ol>
+          <li>Open <strong>Group Policy Management</strong>.</li>
+          <li>Expand <code>lab.local &gt; Workstations</code> and right-click <strong>NYC</strong>.</li>
+          <li>Select <strong>Create a GPO in this domain, and Link it here...</strong>.</li>
+          <li>Name it <strong><code>GPO_NYC_Workstations_Baseline</code></strong>.</li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/Group Policy tests-1788133092462.webp" alt="Create GPO Dialog">
+          <div class="article-image-caption">Figure 1: Creating a new GPO in the NYC OU</div>
+        </div>
+
+        <h2>Step 2: Configure Interactive Logon Banner &amp; Power Settings</h2>
+        <ol>
+          <li>Right-click <strong><code>GPO_NYC_Workstations_Baseline</code></strong> and click <strong>Edit</strong>.</li>
+          <li>Navigate to:
+            <pre><code>Computer Configuration &gt; Policies &gt; Windows Settings &gt; Security Settings &gt; Local Policies &gt; Security Options</code></pre>
+          </li>
+          <li>Configure the banner:
+            <ul>
+              <li><strong>Interactive logon: Message text for users attempting to log on</strong> → <em>"Authorized Access Only. All activity in the NYC domain is monitored."</em></li>
+              <li><strong>Interactive logon: Message title for users attempting to log on</strong> → <em>"NYC Lab Security Notice"</em></li>
+            </ul>
+          </li>
+          <li>Navigate to:
+            <pre><code>Computer Configuration &gt; Policies &gt; Administrative Templates &gt; System &gt; Power Management</code></pre>
+          </li>
+          <li>Enable <strong>Turn off hybrid sleep</strong> to prevent lab VMs from entering deep sleep during testing.</li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/Group Policy tests-1788133135897.webp" alt="Security Options Configuration">
+          <div class="article-image-caption">Figure 2: Configuring logon banner and power settings in GPO editor</div>
+        </div>
+
+        <h2>Step 3: Link User Policy for NYC Employees</h2>
+        <p>
+          Create a user policy that maps network drives and applies restrictions.
+        </p>
+
+        <p>
+          <strong>Target:</strong> <code>Lab_Accounts &gt; Employees &gt; NYC</code>
+        </p>
+
+        <ol>
+          <li>In Group Policy Management, navigate to <code>Lab_Accounts &gt; Employees &gt; NYC</code>.</li>
+          <li>Right-click <strong>NYC</strong> → <strong>Create a GPO in this domain, and Link it here...</strong>.</li>
+          <li>Name it <strong><code>GPO_NYC_User_Preferences</code></strong>.</li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/Group Policy tests-1788133161121.webp" alt="User GPO Creation">
+          <div class="article-image-caption">Figure 3: Creating user preferences GPO for NYC employees</div>
+        </div>
+
+        <h3>Configure Drive Mapping and Restrictions</h3>
+        <ol>
+          <li>Right-click <strong><code>GPO_NYC_User_Preferences</code></strong> and <strong>Edit</strong>.</li>
+          <li><strong>Drive Mapping:</strong> Navigate to:
+            <pre><code>User Configuration &gt; Preferences &gt; Windows Settings &gt; Drive Maps</code></pre>
+            <ul>
+              <li>Map <code>S:</code> to <code>\\lab.local\Shares\NYC_Data</code></li>
+            </ul>
+          </li>
+          <li><strong>Control Panel Restriction:</strong> Navigate to:
+            <pre><code>User Configuration &gt; Policies &gt; Administrative Templates &gt; Control Panel</code></pre>
+            <ul>
+              <li>Set <em>Prohibit access to Control Panel and PC settings</em> to <strong>Enabled</strong> (or Enabled with specific access if testing standard user lockdowns)</li>
+            </ul>
+          </li>
+        </ol>
+
+        <h2>Step 4: Verify Inheritance &amp; Apply to Client</h2>
+        <p>
+          GPOs process from Top-Down (Site → Domain → Parent OU → Child OU). Linking at <code>Workstations &gt; NYC</code> ensures only workstations in that container receive these rules.
+        </p>
+
+        <h3>Test Policy Application on Client</h3>
+        <ol>
+          <li>Log onto <strong><code>WIN11-VM</code></strong> as a user in the NYC user OU.</li>
+          <li>Open Command Prompt and run:
+            <pre><code>gpupdate /force
+gpresult /r</code></pre>
+          </li>
+          <li>Review the output:
+            <ul>
+              <li>Under <strong>Computer Settings:</strong> <code>GPO_NYC_Workstations_Baseline</code> should show as Applied</li>
+              <li>Under <strong>User Settings:</strong> <code>GPO_NYC_User_Preferences</code> should show as Applied</li>
+            </ul>
+          </li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/Group Policy tests-1788133183182.webp" alt="GPRESULT Output">
+          <div class="article-image-caption">Figure 4: Verifying GPO application with gpresult /r command</div>
+        </div>
+
+        <h2>Troubleshooting: Drive Mapping Not Loading</h2>
+        <p>
+          After running <code>gpupdate /force</code>, the mapped drive may not appear. Here's the common fix:
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Group Policy tests-1788133205872.webp" alt="Missing Drive Mapping">
+          <div class="article-image-caption">Figure 5: Drive mapping not appearing in File Explorer</div>
+        </div>
+
+        <h3>Root Cause: Shared Folder Doesn't Exist</h3>
+        <p>
+          The GPO references a share path that hasn't been created yet on the Domain Controller.
+        </p>
+
+        <h3>Solution: Create the Shared Folder</h3>
+        <ol>
+          <li>On <strong>DC01</strong>, create the folder: <code>C:\Shares\NYC_Data</code></li>
+          <li>Right-click the folder → <strong>Properties</strong> → <strong>Sharing</strong> tab.</li>
+          <li>Click <strong>Share...</strong> and add <strong>Domain Users</strong> with at least <strong>Read</strong> permissions.</li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/Group Policy tests-1788133242307.webp" alt="Create Share Folder">
+          <div class="article-image-caption">Figure 6: Creating the shared folder on DC01</div>
+        </div>
+
+        <div class="article-image-container">
+          <img src="../attachments/Group Policy tests-1788133266142.webp" alt="Share Permissions">
+          <div class="article-image-caption">Figure 7: Configuring share permissions for Domain Users</div>
+        </div>
+
+        <h3>Update the GPO</h3>
+        <p>
+          Once the share exists, update the GPO to point to the correct path:
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Group Policy tests-1788133294361.webp" alt="Correct Drive Mapping Policy">
+          <div class="article-image-caption">Figure 8: Updating the drive mapping GPO settings</div>
+        </div>
+
+        <h3>Re-test on Client</h3>
+        <ol>
+          <li>Run <code>gpupdate /force</code> again on the client.</li>
+          <li>Open File Explorer.</li>
+          <li>The <strong>NYC_Data (S:)</strong> drive should now appear.</li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/Group Policy tests-1788133319046.webp" alt="Drive Mapping Success">
+          <div class="article-image-caption">Figure 9: Successfully mapped drive now appears in File Explorer</div>
+        </div>
+
+        <h2>Key Takeaways</h2>
+        <ul>
+          <li><strong>GPO Inheritance:</strong> Policies flow down the OU hierarchy. Child OUs inherit parent policies unless explicitly blocked.</li>
+          <li><strong>GPUPDATE:</strong> Always run <code>gpupdate /force</code> after modifying GPOs on the client to immediately refresh policy application.</li>
+          <li><strong>GPRESULT:</strong> Use <code>gpresult /r</code> to verify which GPOs are actually applied to a specific user/computer.</li>
+          <li><strong>Shared Resources:</strong> Ensure network shares, UNC paths, and permissions exist before referencing them in GPOs.</li>
+          <li><strong>Testing:</strong> Test GPOs on client machines before applying domain-wide to catch configuration issues early.</li>
+        </ul>
+
+        <div class="obsidian-callout tip">
+          <div class="obsidian-callout-title">
+            <i class="fa-solid fa-lightbulb" style="color: var(--accent-emerald);"></i> Pro Tip: Group Policy Search
+          </div>
+          <p>
+            Use the Group Policy Management Console search feature to quickly find specific policies. You can also export GPO configurations to XML for documentation and audit purposes.
+          </p>
+        </div>
+      </div>
+
+      <!-- Footer navigation -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 3rem 0;">
+        <a href="../index.html" class="btn btn-outline">
+          <i class="fa-solid fa-arrow-left"></i> All Articles
+        </a>
+        <a href="pfsense-proxmox-isolated-lab.html" class="btn btn-outline">
+          Next Lab: pfSense + Proxmox <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© <span id="current-year">2026</span> Luis Baldera. Hosted securely with GitHub Pages.</p>
+      <p style="margin-top: 0.3rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);">
+        Data Security • IAM • Microsoft Defender ATP • Entra ID • M365 Defensive Operations
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../script.js"></script>
+</body>
+</html>

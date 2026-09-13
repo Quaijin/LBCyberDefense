@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Windows Server Domain Controller Setup Guide | Luis Baldera</title>
+  <meta name="description" content="Complete guide to deploying Active Directory Domain Services on Windows Server, configuring DNS, building OU structures, and joining client machines to a domain.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../favicon.png">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <!-- Background Decorations -->
+  <div class="bg-grid-overlay"></div>
+  <div class="bg-radial-glow"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="../../index.html" class="nav-brand" title="Return to Home">
+        <span class="nav-brand-icon"><img src="../../favicon.png" alt="Logo" style="width: 20px; height: 20px;"></span>
+        <span>lbcyberdefense</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../../index.html">Portfolio &amp; Labs</a></li>
+        <li><a href="../index.html" class="nav-link-active">Blog &amp; Knowledge Base</a></li>
+        <li><a href="../../resume.html">Resume</a></li>
+        <li><a href="../../index.html#connect">Connect</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button id="theme-toggle-btn" class="btn btn-outline btn-sm" aria-label="Toggle light and dark mode" title="Toggle theme">
+          <i id="theme-icon" class="fa-solid fa-sun"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="article-content">
+      <!-- Breadcrumb -->
+      <div style="margin-top: 2rem; font-family: var(--font-mono); font-size: 0.85rem;">
+        <a href="../index.html" style="color: var(--accent-cyan); text-decoration: none;">
+          <i class="fa-solid fa-arrow-left"></i> Back to All Lab Write-ups
+        </a>
+      </div>
+
+      <!-- Article Header -->
+      <header class="blog-header">
+        <div class="status-badge" style="margin-bottom: 0.8rem;">
+          <span class="pulse-dot"></span>
+          <span>ACTIVE DIRECTORY &amp; IDENTITY MANAGEMENT</span>
+        </div>
+        <h1 style="font-size: 2.35rem; line-height: 1.25; font-weight: 800; margin-bottom: 0.75rem;">
+          Windows Server Domain Controller Setup Guide
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">
+          Deploy Active Directory Domain Services, configure DNS, build organizational unit structures, and join Windows clients to your domain for enterprise lab environments.
+        </p>
+
+        <div class="blog-meta">
+          <span><i class="fa-regular fa-calendar"></i> HomeLab Knowledge Base</span>
+          <span><i class="fa-regular fa-clock"></i> 8 min read</span>
+          <span><i class="fa-solid fa-tag" style="color: var(--accent-cyan);"></i> Active Directory, Windows Server, AD DS, DNS, Domain</span>
+        </div>
+      </header>
+
+      <!-- Main Article Body -->
+      <div class="card" style="margin-bottom: 2.5rem; padding: 2rem;">
+        <p>
+          This guide walks through deploying a Windows Server Domain Controller in your Proxmox lab environment. You'll learn how to set up Active Directory Domain Services (AD DS), build organizational units, and join client machines to your domain.
+        </p>
+
+        <h2>Phase 1: Windows Server Preparation &amp; AD DS Role</h2>
+        <p>
+          Before installing Active Directory Domain Services (AD DS), your server must be properly prepared with a static IP and appropriate configuration.
+        </p>
+
+        <h3>Step 1: Set a Static IP</h3>
+        <p>
+          Your Domain Controller (DC) must have a consistent IP address that does not change.
+        </p>
+        <ol>
+          <li>Open <strong>Network Connections</strong> on your Windows Server VM.</li>
+          <li>Right-click your network adapter &rarr; <strong>Properties</strong> &rarr; <strong>IPv4</strong>.</li>
+          <li>Assign a static IP (e.g., <code>192.168.1.10</code>).</li>
+          <li><strong>CRUCIAL:</strong> Set the <strong>Preferred DNS server</strong> to <code>127.0.0.1</code> (the machine itself). This ensures the DC queries itself for DNS resolution.</li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/Domain Controller Config-1782685342016.webp" alt="Static IP Configuration">
+          <div class="article-image-caption">Figure 1: Setting a static IP address on the Domain Controller</div>
+        </div>
+
+        <div class="article-image-container">
+          <img src="../attachments/Domain Controller Config-1782685388960.webp" alt="DNS Configuration">
+          <div class="article-image-caption">Figure 2: Configuring DNS to point to localhost (127.0.0.1)</div>
+        </div>
+
+        <h3>Step 2: Rename the Server</h3>
+        <p>
+          Give your server a clear, descriptive name such as <code>DC01</code> via System Properties, then reboot.
+        </p>
+
+        <h3>Step 3: Install AD DS Role</h3>
+        <ol>
+          <li>Open <strong>Server Manager</strong> &rarr; <strong>Manage</strong> &rarr; <strong>Add Roles and Features</strong>.</li>
+          <li>Select <strong>Active Directory Domain Services</strong> and proceed with the installation.</li>
+          <li>Complete the wizard and let the server install the necessary binaries.</li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/Domain Controller Config-1782685431150.webp" alt="Add Roles and Features Wizard">
+          <div class="article-image-caption">Figure 3: Server Manager Add Roles and Features Wizard</div>
+        </div>
+
+        <div class="article-image-container">
+          <img src="../attachments/Domain Controller Config-1782685464118.webp" alt="Select AD DS Role">
+          <div class="article-image-caption">Figure 4: Selecting Active Directory Domain Services role</div>
+        </div>
+
+        <h3>Step 4: Promote to Domain Controller</h3>
+        <p>
+          After AD DS installation, a notification flag will appear in Server Manager.
+        </p>
+        <ol>
+          <li>Click the <strong>notification flag icon</strong> in Server Manager.</li>
+          <li>Select <strong>Promote this server to a domain controller</strong>.</li>
+          <li>Select <strong>Add a new forest</strong>.</li>
+          <li>Enter your <strong>Root domain name</strong> (e.g., <code>lab.local</code>).</li>
+          <li>Set a strong <strong>Directory Services Restore Mode (DSRM) password</strong> and store it securely.</li>
+          <li>Follow the wizard with default settings and allow the server to restart.</li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/Domain Controller Config-1782685500074.webp" alt="Promote to Domain Controller">
+          <div class="article-image-caption">Figure 5: Promotion dialog for Domain Controller</div>
+        </div>
+
+        <div class="article-image-container">
+          <img src="../attachments/Domain Controller Config-1782685523586.webp" alt="Domain Configuration">
+          <div class="article-image-caption">Figure 6: Domain forest and DNS configuration</div>
+        </div>
+
+        <h2>Phase 2: Building the OU Structure</h2>
+        <p>
+          Organizational Units (OUs) are your "filing cabinets" for organizing users, computers, and servers. They allow you to apply specific Group Policy Objects (GPOs) to different departments or device types.
+        </p>
+
+        <h3>Create the OU Hierarchy</h3>
+        <ol>
+          <li>Open <strong>Active Directory Users and Computers (ADUC)</strong>: Press <code>Win + R</code>, type <code>dsa.msc</code>, and press Enter.</li>
+          <li>Right-click your domain (e.g., <code>lab.local</code>) &rarr; <strong>New</strong> &rarr; <strong>Organizational Unit</strong>.</li>
+          <li>Create the following structure:
+            <ul>
+              <li><code>_Admin</code> (Use an underscore to force it to the top)</li>
+              <li><code>Users</code> (With sub-OUs for departments like <code>IT</code>, <code>HR</code>, <code>NYC</code>)</li>
+              <li><code>Workstations</code> (With sub-OUs for locations like <code>NYC</code>)</li>
+              <li><code>Servers</code></li>
+            </ul>
+          </li>
+        </ol>
+
+        <h3>Create a Test User</h3>
+        <ol>
+          <li>Right-click your <code>Users &rarr; IT</code> OU &rarr; <strong>New</strong> &rarr; <strong>User</strong>.</li>
+          <li>Follow the wizard to create a test account (e.g., <code>jdoe</code>) and set an initial password.</li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/Domain Controller Config-1782685552802.webp" alt="OU Structure">
+          <div class="article-image-caption">Figure 7: Completed OU structure in Active Directory Users and Computers</div>
+        </div>
+
+        <h2>Phase 3: Joining a Client Machine</h2>
+        <p>
+          Now that your Domain Controller is operational, you can join Windows 10 or Windows 11 client machines to your domain.
+        </p>
+
+        <h3>Configure the Client</h3>
+        <ol>
+          <li><strong>Network Configuration:</strong> Ensure the client VM's network adapter is on the <strong>same virtual bridge</strong> (e.g., <code>vmbr1</code>) as your DC.</li>
+          <li><strong>DNS Configuration:</strong> Set the client's <strong>Preferred DNS</strong> to the IP address of your DC (e.g., <code>192.168.1.10</code>). <em>This is the most common point of failure—the client must be able to resolve your domain name.</em></li>
+        </ol>
+
+        <h3>Join the Domain</h3>
+        <ol>
+          <li>On the client machine, right-click <strong>This PC</strong> &rarr; <strong>Properties</strong> &rarr; <strong>Advanced system settings</strong>.</li>
+          <li>Go to the <strong>Computer Name</strong> tab &rarr; <strong>Change</strong>.</li>
+          <li>Select <strong>Domain</strong> and type your domain name (e.g., <code>lab.local</code>) &rarr; <strong>OK</strong>.</li>
+          <li>When prompted, enter your Domain Administrator credentials (the <code>Administrator</code> account on your DC).</li>
+          <li>Restart the client machine.</li>
+          <li>You can now log in using domain credentials: <code>LAB\jdoe</code>.</li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/Domain Controller Config-1782685615584.webp" alt="Domain Join Dialog">
+          <div class="article-image-caption">Figure 8: Windows client joining the domain</div>
+        </div>
+
+        <h2>Troubleshooting: DNS Delegation Issue</h2>
+        <p>
+          When promoting your server to a Domain Controller, you may encounter a "DNS delegation" warning. This is very common in isolated lab environments.
+        </p>
+
+        <h3>Why This Happens</h3>
+        <p>
+          The error occurs because the DNS server cannot create a "delegation" in the parent DNS zone. Since your lab domain (<code>lab.local</code>) is isolated inside Proxmox and not registered with a public registrar, there is no "parent zone" to delegate to.
+        </p>
+
+        <h3>How to Proceed</h3>
+        <p>
+          <strong>You can safely ignore this warning.</strong> Simply click <strong>Next</strong> in the promotion wizard. Your Active Directory will function perfectly for your internal lab.
+        </p>
+
+        <p>
+          Once promotion completes, verify your DNS health:
+        </p>
+        <ol>
+          <li>Open <strong>Server Manager</strong> &rarr; <strong>Tools</strong> &rarr; <strong>DNS</strong>.</li>
+          <li>Expand your server name &rarr; <strong>Forward Lookup Zones</strong>.</li>
+          <li>Ensure your domain (e.g., <code>lab.local</code>) is listed with <code>_msdcs</code>, <code>_sites</code>, <code>_tcp</code>, and <code>_udp</code> folders. These are automatically created and are critical for AD functionality.</li>
+        </ol>
+
+        <div class="highlight-box">
+          <strong>Proxmox Lab Tip:</strong> If clients cannot find the domain later, verify that the <strong>Network Bridge</strong> in your Proxmox VM settings is correct so the DC and client machines can communicate on the same virtual subnet. Also ensure the <strong>client's DNS setting</strong> points only to your DC's IP.
+        </div>
+
+        <h2>Next Steps</h2>
+        <p>
+          Once your domain is operational, you can:
+        </p>
+        <ul>
+          <li>Configure <strong>Group Policy Objects (GPOs)</strong> for security baselines.</li>
+          <li>Create user accounts and security groups for role-based access control.</li>
+          <li>Join additional workstations and servers to the domain.</li>
+          <li>Configure domain-wide security policies and audit logging.</li>
+        </ul>
+      </div>
+
+      <!-- Footer navigation -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 3rem 0;">
+        <a href="../index.html" class="btn btn-outline">
+          <i class="fa-solid fa-arrow-left"></i> All Articles
+        </a>
+        <a href="windows-server-group-policy.html" class="btn btn-outline">
+          Next Lab: Group Policy Setup <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© <span id="current-year">2026</span> Luis Baldera. Hosted securely with GitHub Pages.</p>
+      <p style="margin-top: 0.3rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);">
+        Data Security • IAM • Microsoft Defender ATP • Entra ID • M365 Defensive Operations
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../script.js"></script>
+</body>
+</html>
