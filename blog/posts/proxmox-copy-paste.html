@@ -5,54 +5,182 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Enabling Copy & Paste in Proxmox | Luis Baldera</title>
   <meta name="description" content="Guide to enabling copy and paste functionality in Proxmox VMs via VNC, xterm.js, or SPICE.">
+
+  <!-- Favicon -->
   <link rel="icon" type="image/png" href="../../favicon.png">
-  <link rel="stylesheet" href="../../style.css">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
+  <!-- Background Decorations -->
   <div class="bg-grid-overlay"></div>
   <div class="bg-radial-glow"></div>
-  
+
+  <!-- Navigation Bar -->
   <header class="navbar">
     <div class="container nav-content">
-      <a href="../../index.html" class="nav-brand"><span>lbcyberdefense</span></a>
+      <a href="../../index.html" class="nav-brand" title="Return to Home">
+        <span class="nav-brand-icon"><img src="../../favicon.png" alt="Logo" style="width: 20px; height: 20px;"></span>
+        <span>lbcyberdefense</span>
+      </a>
       <ul class="nav-links">
-        <li><a href="../../index.html">Portfolio & Labs</a></li>
-        <li><a href="../index.html">Blog</a></li>
+        <li><a href="../../index.html">Portfolio &amp; Labs</a></li>
+        <li><a href="../index.html" class="nav-link-active">Blog &amp; Knowledge Base</a></li>
+        <li><a href="../../resume.html">Resume</a></li>
+        <li><a href="../../index.html#connect">Connect</a></li>
       </ul>
+      <div class="nav-actions">
+        <button id="theme-toggle-btn" class="btn btn-outline btn-sm" aria-label="Toggle light and dark mode" title="Toggle theme">
+          <i id="theme-icon" class="fa-solid fa-sun"></i>
+        </button>
+      </div>
     </div>
   </header>
 
   <main class="container">
     <article class="article-content">
+      <!-- Breadcrumb -->
+      <div style="margin-top: 2rem; font-family: var(--font-mono); font-size: 0.85rem;">
+        <a href="../index.html" style="color: var(--accent-cyan); text-decoration: none;">
+          <i class="fa-solid fa-arrow-left"></i> Back to All Lab Write-ups
+        </a>
+      </div>
+
+      <!-- Article Header -->
       <header class="blog-header">
-        <h1>Enabling Copy & Paste in Proxmox</h1>
+        <div class="status-badge" style="margin-bottom: 0.8rem;">
+          <span class="pulse-dot"></span>
+          <span>PROXMOX VE CONSOLE</span>
+        </div>
+        <h1 style="font-size: 2.35rem; line-height: 1.25; font-weight: 800; margin-bottom: 0.75rem;">
+          Enabling Copy &amp; Paste in Proxmox
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">
+          By default, Proxmox uses noVNC which lacks clipboard functionality. Learn three methods to enable copy and paste in your virtual machines.
+        </p>
+
+        <div class="blog-meta">
+          <span><i class="fa-regular fa-calendar"></i> HomeLab Knowledge Base</span>
+          <span><i class="fa-regular fa-clock"></i> 5 min read</span>
+          <span><i class="fa-solid fa-tag" style="color: var(--accent-cyan);"></i> Proxmox, VNC, Console, Workflow</span>
+        </div>
       </header>
 
-      <div class="card" style="padding: 2rem;">
-        <p>By default, Proxmox uses noVNC, which does not support clipboard functionality. Here are three ways to enable it.</p>
+      <!-- Main Article Body -->
+      <div class="card" style="margin-bottom: 2.5rem; padding: 2rem;">
+        <p>
+          By default, Proxmox uses <strong>noVNC</strong>, which does not support clipboard functionality. Here are three ways to enable copy and paste in your virtual machines.
+        </p>
 
-        <h2>Using VNC Clipboard</h2>
+        <h2>Method 1: Using VNC Clipboard</h2>
+        <p>
+          This method leverages the native VNC clipboard feature. It requires enabling the clipboard setting in your VM's display configuration.
+        </p>
         <ol>
-          <li>Enable clipboard in Display settings.</li>
-          <li>Insert virtio driver file in VM.</li>
-          <li>Reboot.</li>
+          <li>In Proxmox, open your VM and navigate to <strong>Hardware &rarr; Display</strong>.</li>
+          <li>Enable the <strong>clipboard</strong> option.</li>
+          <li>If using a Windows VM, insert the VirtIO driver file.</li>
+          <li>Reboot the VM.</li>
         </ol>
-        <img src="../attachments/Enable Copy Paste in proxmox-1788118110460.webp" alt="Display Settings">
-        <img src="../attachments/Enable Copy Paste in proxmox-1788118527525.webp" alt="Clipboard Icon">
 
-        <h2>Using xterm.js</h2>
-        <p>Add a Serial Port, edit <code>/etc/default/grub</code>:</p>
+        <div class="article-image-container">
+          <img src="../attachments/Enable Copy Paste in proxmox-1788118110460.webp" alt="Proxmox Display Settings">
+          <div class="article-image-caption">Figure 1: Enable clipboard in Display settings</div>
+        </div>
+
+        <div class="article-image-container">
+          <img src="../attachments/Enable Copy Paste in proxmox-1788118527525.webp" alt="Clipboard Configuration">
+          <div class="article-image-caption">Figure 2: Clipboard icon in Proxmox console</div>
+        </div>
+
+        <h2>Method 2: Using xterm.js Serial Console</h2>
+        <p>
+          xterm.js provides a web-based terminal with full clipboard support. This method is ideal for Linux VMs and offers superior clipboard integration.
+        </p>
+        <ol>
+          <li>In Proxmox, navigate to your VM's <strong>Hardware</strong> tab.</li>
+          <li>Click <strong>Add &rarr; Serial Port</strong> and set it to port 0.</li>
+          <li>SSH into the VM and edit the GRUB bootloader configuration:</li>
+        </ol>
+
+        <pre><code>sudo nano /etc/default/grub</code></pre>
+
+        <p>Add serial console parameters to the <code>GRUB_CMDLINE_LINUX_DEFAULT</code> line:</p>
+
         <pre><code>GRUB_CMDLINE_LINUX_DEFAULT="quiet console=tty0 console=ttyS0,115200"</code></pre>
-        <p>Restart and select xterm.js in the console menu.</p>
-        <img src="../attachments/Enable Copy Paste in proxmox-1788119585307.webp" alt="Serial Port">
-        <img src="../attachments/Enable Copy Paste in proxmox-1788119611051.webp" alt="xterm.js">
 
-        <h2>Using SPICE</h2>
-        <p>Set Display to SPICE, install Virt-viewer on your client, and select SPICE in the console menu.</p>
-        <img src="../attachments/Enable Copy Paste in proxmox-1788118660577.webp" alt="SPICE Setting">
+        <p>Update GRUB and reboot:</p>
+
+        <pre><code>sudo update-grub
+sudo reboot</code></pre>
+
+        <p>Once rebooted, open the Proxmox console, click the dropdown menu, and select <strong>xterm.js</strong>.</p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Enable Copy Paste in proxmox-1788119585307.webp" alt="Serial Port Configuration">
+          <div class="article-image-caption">Figure 3: Add Serial Port to VM hardware</div>
+        </div>
+
+        <div class="article-image-container">
+          <img src="../attachments/Enable Copy Paste in proxmox-1788119611051.webp" alt="xterm.js Console">
+          <div class="article-image-caption">Figure 4: Select xterm.js from console menu for clipboard support</div>
+        </div>
+
+        <h2>Method 3: Using SPICE Display Protocol</h2>
+        <p>
+          SPICE (Simple Protocol for Independent Computing Environments) is a remote display protocol with excellent clipboard support. This method requires a dedicated SPICE viewer.
+        </p>
+        <ol>
+          <li>In Proxmox, navigate to your VM's <strong>Hardware &rarr; Display</strong>.</li>
+          <li>Change the display type from <code>VNC</code> to <code>SPICE</code>.</li>
+          <li>On your client machine, install <strong>Virt-Viewer</strong>:
+            <ul>
+              <li><strong>Windows:</strong> Download from <a href="https://virt-manager.org/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan);">virt-manager.org</a></li>
+              <li><strong>Linux:</strong> <code>sudo apt install virt-viewer</code></li>
+              <li><strong>macOS:</strong> <code>brew install virt-viewer</code></li>
+            </ul>
+          </li>
+          <li>In the Proxmox console dropdown, select <strong>SPICE</strong> to launch Virt-Viewer.</li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/Enable Copy Paste in proxmox-1788118660577.webp" alt="SPICE Display Setting">
+          <div class="article-image-caption">Figure 5: Configure VM to use SPICE display protocol</div>
+        </div>
+
+        <div class="highlight-box">
+          <strong>Recommendation:</strong> For most use cases, <strong>xterm.js</strong> provides the best balance of ease-of-use and clipboard support without additional software installation. SPICE is ideal if you need a full desktop environment with mouse and keyboard integration.
+        </div>
+      </div>
+
+      <!-- Footer navigation -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 3rem 0;">
+        <a href="../index.html" class="btn btn-outline">
+          <i class="fa-solid fa-arrow-left"></i> All Articles
+        </a>
+        <a href="proxmox-lxc-ssh-setup.html" class="btn btn-outline">
+          Next Lab: LXC SSH Setup <i class="fa-solid fa-arrow-right"></i>
+        </a>
       </div>
     </article>
   </main>
+
+  <footer>
+    <div class="container">
+      <p>© <span id="current-year">2026</span> Luis Baldera. Hosted securely with GitHub Pages.</p>
+      <p style="margin-top: 0.3rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);">
+        Data Security • IAM • Microsoft Defender ATP • Entra ID • M365 Defensive Operations
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../script.js"></script>
 </body>
 </html>

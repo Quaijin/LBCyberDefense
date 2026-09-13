@@ -3,43 +3,206 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Proxmox LXC SSH Guide | Luis Baldera</title>
-  <meta name="description" content="Configure LXC containers with passwordless SSH access.">
+  <title>Proxmox LXC SSH Setup Guide | Luis Baldera</title>
+  <meta name="description" content="Configure passwordless SSH access for Proxmox LXC containers using Ed25519 key pairs.">
+
+  <!-- Favicon -->
   <link rel="icon" type="image/png" href="../../favicon.png">
-  <link rel="stylesheet" href="../../style.css">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
+  <!-- Background Decorations -->
   <div class="bg-grid-overlay"></div>
   <div class="bg-radial-glow"></div>
-  
+
+  <!-- Navigation Bar -->
   <header class="navbar">
     <div class="container nav-content">
-      <a href="../../index.html" class="nav-brand"><span>lbcyberdefense</span></a>
+      <a href="../../index.html" class="nav-brand" title="Return to Home">
+        <span class="nav-brand-icon"><img src="../../favicon.png" alt="Logo" style="width: 20px; height: 20px;"></span>
+        <span>lbcyberdefense</span>
+      </a>
       <ul class="nav-links">
-        <li><a href="../../index.html">Portfolio & Labs</a></li>
-        <li><a href="../index.html">Blog</a></li>
+        <li><a href="../../index.html">Portfolio &amp; Labs</a></li>
+        <li><a href="../index.html" class="nav-link-active">Blog &amp; Knowledge Base</a></li>
+        <li><a href="../../resume.html">Resume</a></li>
+        <li><a href="../../index.html#connect">Connect</a></li>
       </ul>
+      <div class="nav-actions">
+        <button id="theme-toggle-btn" class="btn btn-outline btn-sm" aria-label="Toggle light and dark mode" title="Toggle theme">
+          <i id="theme-icon" class="fa-solid fa-sun"></i>
+        </button>
+      </div>
     </div>
   </header>
 
   <main class="container">
     <article class="article-content">
+      <!-- Breadcrumb -->
+      <div style="margin-top: 2rem; font-family: var(--font-mono); font-size: 0.85rem;">
+        <a href="../index.html" style="color: var(--accent-cyan); text-decoration: none;">
+          <i class="fa-solid fa-arrow-left"></i> Back to All Lab Write-ups
+        </a>
+      </div>
+
+      <!-- Article Header -->
       <header class="blog-header">
-        <h1>Proxmox LXC SSH Setup Guide</h1>
+        <div class="status-badge" style="margin-bottom: 0.8rem;">
+          <span class="pulse-dot"></span>
+          <span>PROXMOX LXC CONTAINERS</span>
+        </div>
+        <h1 style="font-size: 2.35rem; line-height: 1.25; font-weight: 800; margin-bottom: 0.75rem;">
+          Proxmox LXC SSH Setup Guide
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">
+          Configure passwordless SSH access for Proxmox LXC containers using Ed25519 key pairs for secure, key-based authentication.
+        </p>
+
+        <div class="blog-meta">
+          <span><i class="fa-regular fa-calendar"></i> HomeLab Knowledge Base</span>
+          <span><i class="fa-regular fa-clock"></i> 4 min read</span>
+          <span><i class="fa-solid fa-tag" style="color: var(--accent-cyan);"></i> LXC, SSH, Key-Based Auth, Linux</span>
+        </div>
       </header>
 
-      <div class="card" style="padding: 2rem;">
-        <p>How to configure passwordless SSH access for an LXC container.</p>
-        
-        <h2>1. Generate Keys</h2>
-        <pre><code>ssh-keygen -t ed25519 -f "$HOME\.ssh\id_proxmox_lxc"</code></pre>
+      <!-- Main Article Body -->
+      <div class="card" style="margin-bottom: 2.5rem; padding: 2rem;">
+        <p>
+          This guide walks through setting up passwordless SSH access for Proxmox LXC containers using Ed25519 key pairs. This provides secure, automated access without password-based authentication.
+        </p>
 
-        <h2>2. Configure in Proxmox</h2>
-        <p>Paste the public key (<code>.pub</code> file) into the SSH public key field during container creation.</p>
-        <img src="../attachments/Proxmox_LXC_SSH_Setup_Guide-1788116823676.png" alt="SSH Key Setup">
+        <h2>Step 1: Generate SSH Key Pair</h2>
+        <p>
+          On your <strong>host machine</strong> (or management workstation), generate a new Ed25519 key pair:
+        </p>
+
+        <pre><code>ssh-keygen -t ed25519 -f "$HOME/.ssh/id_proxmox_lxc" -C "proxmox-lxc-key"</code></pre>
+
+        <p>
+          On <strong>Windows</strong>, use PowerShell with escaped backslashes:
+        </p>
+
+        <pre><code>ssh-keygen -t ed25519 -f "$HOME\.ssh\id_proxmox_lxc" -C "proxmox-lxc-key"</code></pre>
+
+        <p>
+          This creates two files:
+        </p>
+        <ul>
+          <li><code>id_proxmox_lxc</code> — Private key (keep this secure, never share)</li>
+          <li><code>id_proxmox_lxc.pub</code> — Public key (paste into Proxmox)</li>
+        </ul>
+
+        <h2>Step 2: Extract the Public Key</h2>
+        <p>
+          Display the public key content:
+        </p>
+
+        <pre><code>cat "$HOME/.ssh/id_proxmox_lxc.pub"</code></pre>
+
+        <p>
+          Copy the entire output (it should start with <code>ssh-ed25519</code>).
+        </p>
+
+        <h2>Step 3: Configure LXC Container in Proxmox</h2>
+        <p>
+          When creating a new LXC container in Proxmox, during the setup wizard:
+        </p>
+
+        <ol>
+          <li>Navigate to the <strong>SSH public key</strong> field.</li>
+          <li>Paste the contents of your <code>id_proxmox_lxc.pub</code> file.</li>
+          <li>Complete the container creation.</li>
+        </ol>
+
+        <div class="article-image-container">
+          <img src="../attachments/Proxmox_LXC_SSH_Setup_Guide-1788116823676.png" alt="Proxmox LXC SSH Key Configuration">
+          <div class="article-image-caption">Figure 1: SSH public key field during LXC container creation in Proxmox</div>
+        </div>
+
+        <h2>Step 4: Access the Container</h2>
+        <p>
+          Once the container is created and running, SSH into it using your private key:
+        </p>
+
+        <pre><code>ssh -i "$HOME/.ssh/id_proxmox_lxc" root@&lt;CONTAINER_IP&gt;</code></pre>
+
+        <p>
+          Replace <code>&lt;CONTAINER_IP&gt;</code> with the container's IP address (find this in Proxmox under the container's Network settings).
+        </p>
+
+        <div class="highlight-box">
+          <strong>Pro Tip:</strong> Add an entry to your local <code>~/.ssh/config</code> file for easier access:
+          <pre style="margin-top: 0.5rem;"><code>Host proxmox-lxc
+  HostName &lt;CONTAINER_IP&gt;
+  User root
+  IdentityFile ~/.ssh/id_proxmox_lxc
+  StrictHostKeyChecking accept-new</code></pre>
+          Then simply run: <code>ssh proxmox-lxc</code>
+        </div>
+
+        <h2>Step 5: Verify Key-Based Authentication Works</h2>
+        <p>
+          Once connected, verify that the public key is installed in the container:
+        </p>
+
+        <pre><code>cat ~/.ssh/authorized_keys</code></pre>
+
+        <p>
+          You should see your Ed25519 public key listed.
+        </p>
+
+        <div class="obsidian-callout tip">
+          <div class="obsidian-callout-title">
+            <i class="fa-solid fa-lightbulb" style="color: var(--accent-emerald);"></i> Security Best Practice
+          </div>
+          <p>
+            Ed25519 keys are more secure than traditional RSA keys and are the recommended standard for new SSH key generation. They offer better performance and stronger cryptography.
+          </p>
+        </div>
+
+        <h2>Troubleshooting</h2>
+        <ul>
+          <li>
+            <strong>Permission Denied (publickey):</strong> Ensure the public key was correctly pasted during container creation. Recreate the container with the correct key if needed.
+          </li>
+          <li>
+            <strong>Cannot resolve hostname:</strong> Verify the container is running and has a valid IP address assigned by DHCP or static configuration.
+          </li>
+          <li>
+            <strong>Connection timeout:</strong> Ensure network connectivity between your host and the container. Check Proxmox network settings and firewall rules.
+          </li>
+        </ul>
+      </div>
+
+      <!-- Footer navigation -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 3rem 0;">
+        <a href="../index.html" class="btn btn-outline">
+          <i class="fa-solid fa-arrow-left"></i> All Articles
+        </a>
+        <a href="proxmox-vm-migration.html" class="btn btn-outline">
+          Next Lab: VM Migration <i class="fa-solid fa-arrow-right"></i>
+        </a>
       </div>
     </article>
   </main>
+
+  <footer>
+    <div class="container">
+      <p>© <span id="current-year">2026</span> Luis Baldera. Hosted securely with GitHub Pages.</p>
+      <p style="margin-top: 0.3rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);">
+        Data Security • IAM • Microsoft Defender ATP • Entra ID • M365 Defensive Operations
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../script.js"></script>
 </body>
 </html>

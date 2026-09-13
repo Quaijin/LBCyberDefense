@@ -3,45 +3,205 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Proxmox VM Migration | Luis Baldera</title>
-  <meta name="description" content="Node-to-node VM migration guide for Proxmox.">
+  <title>Proxmox VM Migration Guide | Luis Baldera</title>
+  <meta name="description" content="Step-by-step guide for node-to-node VM migration in Proxmox using backup and restore.">
+
+  <!-- Favicon -->
   <link rel="icon" type="image/png" href="../../favicon.png">
-  <link rel="stylesheet" href="../../style.css">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
+  <!-- Background Decorations -->
   <div class="bg-grid-overlay"></div>
   <div class="bg-radial-glow"></div>
-  
+
+  <!-- Navigation Bar -->
   <header class="navbar">
     <div class="container nav-content">
-      <a href="../../index.html" class="nav-brand"><span>lbcyberdefense</span></a>
+      <a href="../../index.html" class="nav-brand" title="Return to Home">
+        <span class="nav-brand-icon"><img src="../../favicon.png" alt="Logo" style="width: 20px; height: 20px;"></span>
+        <span>lbcyberdefense</span>
+      </a>
       <ul class="nav-links">
-        <li><a href="../../index.html">Portfolio & Labs</a></li>
-        <li><a href="../index.html">Blog</a></li>
+        <li><a href="../../index.html">Portfolio &amp; Labs</a></li>
+        <li><a href="../index.html" class="nav-link-active">Blog &amp; Knowledge Base</a></li>
+        <li><a href="../../resume.html">Resume</a></li>
+        <li><a href="../../index.html#connect">Connect</a></li>
       </ul>
+      <div class="nav-actions">
+        <button id="theme-toggle-btn" class="btn btn-outline btn-sm" aria-label="Toggle light and dark mode" title="Toggle theme">
+          <i id="theme-icon" class="fa-solid fa-sun"></i>
+        </button>
+      </div>
     </div>
   </header>
 
   <main class="container">
     <article class="article-content">
+      <!-- Breadcrumb -->
+      <div style="margin-top: 2rem; font-family: var(--font-mono); font-size: 0.85rem;">
+        <a href="../index.html" style="color: var(--accent-cyan); text-decoration: none;">
+          <i class="fa-solid fa-arrow-left"></i> Back to All Lab Write-ups
+        </a>
+      </div>
+
+      <!-- Article Header -->
       <header class="blog-header">
-        <h1>Proxmox VM Migration Guide</h1>
+        <div class="status-badge" style="margin-bottom: 0.8rem;">
+          <span class="pulse-dot"></span>
+          <span>PROXMOX VM ADMINISTRATION</span>
+        </div>
+        <h1 style="font-size: 2.35rem; line-height: 1.25; font-weight: 800; margin-bottom: 0.75rem;">
+          Proxmox VM Migration Guide
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">
+          Move virtual machines between Proxmox nodes using the backup and restore workflow for seamless node-to-node migration.
+        </p>
+
+        <div class="blog-meta">
+          <span><i class="fa-regular fa-calendar"></i> HomeLab Knowledge Base</span>
+          <span><i class="fa-regular fa-clock"></i> 5 min read</span>
+          <span><i class="fa-solid fa-tag" style="color: var(--accent-cyan);"></i> Proxmox, Migration, VM Management, Backup</span>
+        </div>
       </header>
 
-      <div class="card" style="padding: 2rem;">
+      <!-- Main Article Body -->
+      <div class="card" style="margin-bottom: 2.5rem; padding: 2rem;">
+        <p>
+          This guide covers migrating a virtual machine from one Proxmox node to another using the backup and restore method. This approach provides a reliable way to transfer VMs across different Proxmox hosts.
+        </p>
+
         <h2>Phase 1: Connectivity Audit</h2>
-        <p>Check interface configurations on both nodes: <code>ip -br -c a</code></p>
-        <p>Test connectivity: <code>ping [IP_OF_OTHER_NODE]</code></p>
+        <p>
+          Before beginning the migration, verify network connectivity between the source and destination Proxmox nodes.
+        </p>
 
-        <h2>Phase 2: Transfer</h2>
-        <p>Use <code>scp</code> to move the backup file:</p>
-        <pre><code>scp /var/lib/vz/dump/backup.vma.zst root@destination:/var/lib/vz/dump/</code></pre>
+        <p><strong>On the source node, check interface configurations:</strong></p>
+        <pre><code>ip -br -c a</code></pre>
 
-        <h2>Phase 3: Restore</h2>
-        <pre><code>qmrestore /var/lib/vz/dump/backup.vma.zst 101 --storage local-lvm</code></pre>
+        <p><strong>Verify connectivity to the destination node:</strong></p>
+        <pre><code>ping [IP_OF_DESTINATION_NODE]</code></pre>
+
+        <p>
+          Ensure both nodes can communicate over the network and that SSH access between nodes is configured. For multi-node clusters, connectivity should already be established.
+        </p>
+
+        <h2>Phase 2: Backup the VM</h2>
+        <p>
+          Create a backup of the VM on the source node. Navigate to the VM in Proxmox and create a backup:
+        </p>
+
+        <ol>
+          <li>In Proxmox Web UI, select the VM you want to migrate.</li>
+          <li>Click <strong>Backup Now</strong>.</li>
+          <li>Select a storage location with sufficient space.</li>
+          <li>Wait for the backup to complete.</li>
+        </ol>
+
+        <p>
+          Alternatively, use the command line. First, list available storage:
+        </p>
+
+        <pre><code>pvesm status</code></pre>
+
+        <p>
+          Create the backup:
+        </p>
+
+        <pre><code>vzdump [VM_ID] --storage [STORAGE_NAME] --compress zstd</code></pre>
+
+        <p>
+          This creates a compressed backup file (typically <code>.vma.zst</code> format) in the <code>/var/lib/vz/dump/</code> directory.
+        </p>
+
+        <h2>Phase 3: Transfer the Backup</h2>
+        <p>
+          Transfer the backup file to the destination node using <code>scp</code>:
+        </p>
+
+        <pre><code>scp /var/lib/vz/dump/backup.vma.zst root@[DESTINATION_IP]:/var/lib/vz/dump/</code></pre>
+
+        <p>
+          Replace <code>[DESTINATION_IP]</code> with the IP address of the destination Proxmox node and <code>backup.vma.zst</code> with your actual backup filename.
+        </p>
+
+        <p>
+          Monitor the transfer progress. Large backups may take several minutes or hours depending on network bandwidth and file size.
+        </p>
+
+        <h2>Phase 4: Restore on the Destination Node</h2>
+        <p>
+          SSH into the destination Proxmox node and restore the VM from the backup:
+        </p>
+
+        <pre><code>qmrestore /var/lib/vz/dump/backup.vma.zst [NEW_VM_ID] --storage local-lvm</code></pre>
+
+        <p>
+          Replace <code>[NEW_VM_ID]</code> with the VM ID you want to assign on the destination node (e.g., 101, 102, etc.). Choose a unique ID not currently in use.
+        </p>
+
+        <p>
+          The restoration process will decompress and restore the VM to the specified storage location.
+        </p>
+
+        <div class="highlight-box">
+          <strong>Important:</strong> Ensure the destination node has sufficient storage space before restoring. Check available space with: <code>pvesm status</code>
+        </div>
+
+        <h2>Phase 5: Verification &amp; Cleanup</h2>
+        <p>
+          Once restoration completes:
+        </p>
+
+        <ol>
+          <li>In the Proxmox Web UI on the destination node, verify the VM appears in the VM list.</li>
+          <li>Power on the VM and confirm it boots correctly.</li>
+          <li>Test network connectivity and verify all services are running as expected.</li>
+          <li>Once satisfied, delete the source VM from the original node (optional).</li>
+          <li>Remove the backup files from both nodes to free up space:
+            <pre><code>rm /var/lib/vz/dump/backup.vma.zst</code></pre>
+          </li>
+        </ol>
+
+        <div class="obsidian-callout tip">
+          <div class="obsidian-callout-title">
+            <i class="fa-solid fa-lightbulb" style="color: var(--accent-emerald);"></i> Pro Tip: Automated Migration
+          </div>
+          <p>
+            For larger environments, Proxmox supports live migration for VMs with shared storage. This allows VMs to migrate with minimal downtime without creating backups. Refer to Proxmox documentation for live migration setup.
+          </p>
+        </div>
+      </div>
+
+      <!-- Footer navigation -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 3rem 0;">
+        <a href="../index.html" class="btn btn-outline">
+          <i class="fa-solid fa-arrow-left"></i> All Articles
+        </a>
+        <a href="caddy-tls-reverse-proxy.html" class="btn btn-outline">
+          Next Lab: Caddy TLS <i class="fa-solid fa-arrow-right"></i>
+        </a>
       </div>
     </article>
   </main>
+
+  <footer>
+    <div class="container">
+      <p>© <span id="current-year">2026</span> Luis Baldera. Hosted securely with GitHub Pages.</p>
+      <p style="margin-top: 0.3rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);">
+        Data Security • IAM • Microsoft Defender ATP • Entra ID • M365 Defensive Operations
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../script.js"></script>
 </body>
 </html>
