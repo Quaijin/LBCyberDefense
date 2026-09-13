@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enabling Copy & Paste in Proxmox | Luis Baldera</title>
+  <meta name="description" content="Guide to enabling copy and paste functionality in Proxmox VMs via VNC, xterm.js, or SPICE.">
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div class="bg-grid-overlay"></div>
+  <div class="bg-radial-glow"></div>
+  
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="../../index.html" class="nav-brand"><span>lbcyberdefense</span></a>
+      <ul class="nav-links">
+        <li><a href="../../index.html">Portfolio & Labs</a></li>
+        <li><a href="../index.html">Blog</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="article-content">
+      <header class="blog-header">
+        <h1>Enabling Copy & Paste in Proxmox</h1>
+      </header>
+
+      <div class="card" style="padding: 2rem;">
+        <p>By default, Proxmox uses noVNC, which does not support clipboard functionality. Here are three ways to enable it.</p>
+
+        <h2>Using VNC Clipboard</h2>
+        <ol>
+          <li>Enable clipboard in Display settings.</li>
+          <li>Insert virtio driver file in VM.</li>
+          <li>Reboot.</li>
+        </ol>
+        <img src="../attachments/Enable Copy Paste in proxmox-1788118110460.webp" alt="Display Settings">
+        <img src="../attachments/Enable Copy Paste in proxmox-1788118527525.webp" alt="Clipboard Icon">
+
+        <h2>Using xterm.js</h2>
+        <p>Add a Serial Port, edit <code>/etc/default/grub</code>:</p>
+        <pre><code>GRUB_CMDLINE_LINUX_DEFAULT="quiet console=tty0 console=ttyS0,115200"</code></pre>
+        <p>Restart and select xterm.js in the console menu.</p>
+        <img src="../attachments/Enable Copy Paste in proxmox-1788119585307.webp" alt="Serial Port">
+        <img src="../attachments/Enable Copy Paste in proxmox-1788119611051.webp" alt="xterm.js">
+
+        <h2>Using SPICE</h2>
+        <p>Set Display to SPICE, install Virt-viewer on your client, and select SPICE in the console menu.</p>
+        <img src="../attachments/Enable Copy Paste in proxmox-1788118660577.webp" alt="SPICE Setting">
+      </div>
+    </article>
+  </main>
+</body>
+</html>

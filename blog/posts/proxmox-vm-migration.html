@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proxmox VM Migration | Luis Baldera</title>
+  <meta name="description" content="Node-to-node VM migration guide for Proxmox.">
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div class="bg-grid-overlay"></div>
+  <div class="bg-radial-glow"></div>
+  
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="../../index.html" class="nav-brand"><span>lbcyberdefense</span></a>
+      <ul class="nav-links">
+        <li><a href="../../index.html">Portfolio & Labs</a></li>
+        <li><a href="../index.html">Blog</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="article-content">
+      <header class="blog-header">
+        <h1>Proxmox VM Migration Guide</h1>
+      </header>
+
+      <div class="card" style="padding: 2rem;">
+        <h2>Phase 1: Connectivity Audit</h2>
+        <p>Check interface configurations on both nodes: <code>ip -br -c a</code></p>
+        <p>Test connectivity: <code>ping [IP_OF_OTHER_NODE]</code></p>
+
+        <h2>Phase 2: Transfer</h2>
+        <p>Use <code>scp</code> to move the backup file:</p>
+        <pre><code>scp /var/lib/vz/dump/backup.vma.zst root@destination:/var/lib/vz/dump/</code></pre>
+
+        <h2>Phase 3: Restore</h2>
+        <pre><code>qmrestore /var/lib/vz/dump/backup.vma.zst 101 --storage local-lvm</code></pre>
+      </div>
+    </article>
+  </main>
+</body>
+</html>

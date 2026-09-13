@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proxmox VE Setup Guide | Luis Baldera</title>
+  <meta name="description" content="Step-by-step guide on installing and configuring Proxmox VE on a headless home lab server.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <!-- Background Decorations -->
+  <div class="bg-grid-overlay"></div>
+  <div class="bg-radial-glow"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="../../index.html" class="nav-brand" title="Return to Home">
+        <span class="nav-brand-icon"><img src="../../favicon.png" alt="Logo" style="width: 20px; height: 20px;"></span>
+        <span>lbcyberdefense</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../../index.html">Portfolio &amp; Labs</a></li>
+        <li><a href="../index.html" class="nav-link-active">Blog &amp; Knowledge Base</a></li>
+        <li><a href="../../resume.html">Resume</a></li>
+        <li><a href="../../index.html#connect">Connect</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button id="theme-toggle-btn" class="btn btn-outline btn-sm" aria-label="Toggle light and dark mode" title="Toggle theme">
+          <i id="theme-icon" class="fa-solid fa-sun"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="article-content">
+      <!-- Breadcrumb -->
+      <div style="margin-top: 2rem; font-family: var(--font-mono); font-size: 0.85rem;">
+        <a href="../index.html" style="color: var(--accent-cyan); text-decoration: none;">
+          <i class="fa-solid fa-arrow-left"></i> Back to All Lab Write-ups
+        </a>
+      </div>
+
+      <!-- Article Header -->
+      <header class="blog-header">
+        <div class="status-badge" style="margin-bottom: 0.8rem;">
+          <span class="pulse-dot"></span>
+          <span>PROXMOX VE CONFIGURATION</span>
+        </div>
+        <h1 style="font-size: 2.35rem; line-height: 1.25; font-weight: 800; margin-bottom: 0.75rem;">
+          Proxmox VE Setup Guide
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">
+          Step-by-step guide on installing and configuring Proxmox VE on a headless home lab server.
+        </p>
+
+        <div class="blog-meta">
+          <span><i class="fa-regular fa-calendar"></i> HomeLab Knowledge Base</span>
+          <span><i class="fa-regular fa-clock"></i> 6 min read</span>
+          <span><i class="fa-solid fa-tag" style="color: var(--accent-cyan);"></i> Proxmox, Virtualization, Server Hardening</span>
+        </div>
+      </header>
+
+      <!-- Main Article Body -->
+      <div class="card" style="margin-bottom: 2.5rem; padding: 2rem;">
+        <p>
+          This guide outlines the steps to successfully install and configure Proxmox VE on a repurposed laptop as a headless home lab server.
+        </p>
+
+        <h2>1. Initial Proxmox Installation</h2>
+        <ol>
+          <li><strong>Download:</strong> Obtain the latest Proxmox VE ISO from the official <a href="https://www.proxmox.com/" target="_blank" rel="noopener noreferrer">Proxmox website</a>.</li>
+          <li><strong>Flash:</strong> Use a tool like Etcher or Rufus to write the ISO to a USB drive.</li>
+          <li><strong>Install:</strong> Boot the laptop from the USB drive. Follow the on-screen installer prompts.</li>
+          <li><strong>Network Configuration:</strong> Assign a static IP address, set the Gateway, and configure the management interface to match your local network segment.</li>
+        </ol>
+
+        <h2>2. Configure Headless Operation (Lid Settings)</h2>
+        <p>
+          To prevent the laptop from suspending when the lid is closed, modify the <code>systemd</code> login configuration:
+        </p>
+        <ol>
+          <li>Open the configuration file: <code>nano /etc/systemd/logind.conf</code></li>
+          <li>Locate and uncomment (remove the #) the following lines, setting them to <code>ignore</code>:
+            <pre><code>HandleLidSwitch=ignore
+HandleLidSwitchExternalPower=ignore
+HandleLidSwitchDocked=ignore</code></pre>
+          </li>
+          <li>Save and exit (<code>Ctrl+O</code>, <code>Enter</code>, <code>Ctrl+X</code>).</li>
+          <li>Restart the service to apply changes: <code>systemctl restart systemd-logind</code></li>
+        </ol>
+
+        <h2>3. Configure Screen Timeout</h2>
+        <p>
+          To ensure the screen blanks automatically and saves power, configure the kernel console blanking:
+        </p>
+        <ol>
+          <li>Edit the GRUB configuration: <code>nano /etc/default/grub</code></li>
+          <li>Find the <code>GRUB_CMDLINE_LINUX_DEFAULT</code> line and append <code>consoleblank=30</code>:
+            <pre><code>GRUB_CMDLINE_LINUX_DEFAULT="quiet consoleblank=30"</code></pre>
+          </li>
+          <li>Update the bootloader: <code>update-grub</code></li>
+        </ol>
+
+        <h2>4. Hardware BIOS/UEFI Settings</h2>
+        <p>To ensure high availability for your server:</p>
+        <ol>
+          <li>Enter BIOS/UEFI on startup (usually F1 or Enter).</li>
+          <li>Navigate to <strong>Power</strong> settings.</li>
+          <li>Set <strong>Restore on AC/Power Loss</strong> (or similar) to <strong>Power On</strong>.</li>
+          <li>Save and exit.</li>
+        </ol>
+
+        <h2>5. Verification</h2>
+        <ol>
+          <li>Reboot the system: <code>reboot</code>.</li>
+          <li>Confirm the Proxmox web GUI is accessible at <code>https://&lt;YOUR_IP&gt;:8006</code>.</li>
+          <li>Close the laptop lid and verify that the server remains reachable and the screen turns off after 30 seconds.</li>
+        </ol>
+        
+        <div class="article-image-container">
+          <img src="../attachments/Notes on Proxmox-1782514481062.webp" alt="Proxmox active nodes">
+          <div class="article-image-caption">Figure 1: Live Proxmox active with 2 base servers for testing</div>
+        </div>
+
+        <h2>6. Security Hardening</h2>
+        <p><strong>Objective:</strong> Secure Proxmox Management Interface and Host OS</p>
+        
+        <h3>Perimeter & Network Security</h3>
+        <ul>
+          <li><strong>Disabled Port Forwarding:</strong> Verified no external port mapping (NAT) on the home router.</li>
+          <li><strong>Tailscale Integration:</strong> Implemented WireGuard-based P2P VPN for secure remote access.</li>
+          <li><strong>Firewall Enablement:</strong> Enabled Datacenter and Node-level firewalls. Set Default Input Policy to <strong>DROP</strong>.</li>
+        </ul>
+        <div class="article-image-container">
+          <img src="../attachments/Pasted image 20260627150544.png" alt="Proxmox Firewall Configuration">
+          <div class="article-image-caption">Figure 2: Firewall Configuration</div>
+        </div>
+
+        <h3>Identity & SSH Hardening</h3>
+        <ul>
+          <li><strong>Key-Based Authentication:</strong> Generated unique Ed25519 SSH key pair.</li>
+          <li><strong>Host Lockdown:</strong> Disabled password auth and restricted root login in <code>/etc/ssh/sshd_config</code>.</li>
+        </ul>
+        <div class="article-image-container">
+          <img src="../attachments/Pasted image 20260627150938.png" alt="SSH Hardening">
+          <div class="article-image-caption">Figure 3: SSH Configuration Verification</div>
+        </div>
+        
+        <div class="article-image-container">
+          <img src="../attachments/Pasted image 20260627150641.png" alt="Firewall Config">
+          <div class="article-image-caption">Figure 4: Firewall Configuration</div>
+        </div>
+        
+        <div class="highlight-box">
+          <strong>Critical:</strong> Your Private Key file is your "Master Key." If you lose this file, you will be locked out of your server. Backup your <code>~/.ssh/</code> directory securely.
+        </div>
+        
+        <div class="article-image-container">
+          <img src="../attachments/Notes on Proxmox-1783033865708.webp" alt="Proxmox VM Storage Setting">
+          <div class="article-image-caption">Figure 5: Storage configuration for new VMs</div>
+        </div>
+
+      </div>
+
+      <!-- Footer navigation -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 3rem 0;">
+        <a href="../index.html" class="btn btn-outline">
+          <i class="fa-solid fa-arrow-left"></i> All Articles
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© <span id="current-year">2026</span> Luis Baldera. Hosted securely with GitHub Pages.</p>
+    </div>
+  </footer>
+
+  <script src="../../script.js"></script>
+</body>
+</html>

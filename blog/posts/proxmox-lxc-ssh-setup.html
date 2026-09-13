@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proxmox LXC SSH Guide | Luis Baldera</title>
+  <meta name="description" content="Configure LXC containers with passwordless SSH access.">
+  <link rel="icon" type="image/png" href="../../favicon.png">
+  <link rel="stylesheet" href="../../style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div class="bg-grid-overlay"></div>
+  <div class="bg-radial-glow"></div>
+  
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="../../index.html" class="nav-brand"><span>lbcyberdefense</span></a>
+      <ul class="nav-links">
+        <li><a href="../../index.html">Portfolio & Labs</a></li>
+        <li><a href="../index.html">Blog</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="article-content">
+      <header class="blog-header">
+        <h1>Proxmox LXC SSH Setup Guide</h1>
+      </header>
+
+      <div class="card" style="padding: 2rem;">
+        <p>How to configure passwordless SSH access for an LXC container.</p>
+        
+        <h2>1. Generate Keys</h2>
+        <pre><code>ssh-keygen -t ed25519 -f "$HOME\.ssh\id_proxmox_lxc"</code></pre>
+
+        <h2>2. Configure in Proxmox</h2>
+        <p>Paste the public key (<code>.pub</code> file) into the SSH public key field during container creation.</p>
+        <img src="../attachments/Proxmox_LXC_SSH_Setup_Guide-1788116823676.png" alt="SSH Key Setup">
+      </div>
+    </article>
+  </main>
+</body>
+</html>
