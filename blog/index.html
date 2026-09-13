@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Security Labs &amp; Knowledge Base | Luis Baldera</title>
   <meta name="description" content="Technical write-ups, homelab setups, detection engineering, and cybersecurity tutorials by Luis Baldera.">
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="../favicon.png">
-  
+
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
+
   <!-- Styles -->
   <link rel="stylesheet" href="../style.css">
 </head>
@@ -27,7 +27,7 @@
   <header class="navbar">
     <div class="container nav-content">
       <a href="../index.html" class="nav-brand" title="Return to Home">
-        <span class="nav-brand-icon"><img src="../favicon.png" alt="Logo" style="width: 20px; height: 20px;"></span>
+        <span class="nav-brand-icon"><img src="../favicon.png" alt="Logo"></span>
         <span>lbcyberdefense</span>
       </a>
       <ul class="nav-links">
@@ -37,7 +37,7 @@
         <li><a href="../index.html#connect">Connect</a></li>
       </ul>
       <div class="nav-actions">
-        <button id="theme-toggle-btn" class="btn btn-outline btn-sm" aria-label="Toggle light and dark mode" title="Toggle theme">
+        <button type="button" id="theme-toggle-btn" class="btn btn-outline btn-sm" aria-label="Toggle light and dark mode" title="Toggle theme">
           <i id="theme-icon" class="fa-solid fa-sun"></i>
         </button>
       </div>
@@ -45,12 +45,12 @@
   </header>
 
   <main class="container">
-    <div style="padding: 4rem 0 2rem;">
+    <div class="blog-index-hero">
       <div class="status-badge">
         <span class="pulse-dot"></span>
         <span>TECHNICAL ARTICLES &amp; HOMELAB WRITE-UPS</span>
       </div>
-      
+
       <h1 class="hero-title">
         Security Labs &amp; <span class="text-gradient">Knowledge Base</span>
       </h1>
@@ -59,30 +59,30 @@
       </p>
     </div>
 
-    <section style="border-bottom: none; padding-top: 1rem;">
+    <section class="blog-posts">
       <div class="grid-2">
         <!-- Post 1: Caddy TLS -->
-        <article class="card project-card" style="padding: 1.75rem;">
+        <article class="card project-card blog-post-card">
           <div class="project-top">
-            <span class="project-badge" style="background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.3); color: var(--accent-cyan);">
+            <span class="project-badge blog-post-badge-cyan">
               HOMELAB SECURITY
             </span>
-            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">
+            <span class="blog-post-read-time">
               7 min read
             </span>
           </div>
-          
-          <h2 style="font-size: 1.35rem; margin: 0.75rem 0 0.5rem; font-weight: 700;">
-            <a href="posts/caddy-tls-reverse-proxy.html" style="color: var(--text-main); text-decoration: none;">
+
+          <h2 class="blog-post-title">
+            <a href="posts/caddy-tls-reverse-proxy.html" class="blog-post-link">
               Caddy as a TLS / HTTPS Reverse Proxy for Local Services
             </a>
           </h2>
-          
+
           <p class="project-desc">
             Complete step-by-step guide on deploying Caddy on Ubuntu Server, resolving port conflicts with legacy Nginx containers, issuing internal Certificate Authority (CA) root certs, and establishing trusted local HTTPS across CasaOS and auxiliary apps.
           </p>
-          
-          <div class="skill-tags" style="margin-bottom: 1.25rem;">
+
+          <div class="skill-tags blog-post-tags">
             <span class="tag highlight">Caddy</span>
             <span class="tag">TLS/HTTPS</span>
             <span class="tag">Reverse Proxy</span>
@@ -90,7 +90,7 @@
             <span class="tag">Internal PKI</span>
           </div>
 
-          <div style="margin-top: auto; padding-top: 0.5rem;">
+          <div class="blog-post-action">
             <a href="posts/caddy-tls-reverse-proxy.html" class="btn btn-outline btn-sm">
               Read Lab Write-up <i class="fa-solid fa-arrow-right"></i>
             </a>
@@ -98,27 +98,27 @@
         </article>
 
         <!-- Post 2: pfSense + Proxmox -->
-        <article class="card project-card" style="padding: 1.75rem;">
+        <article class="card project-card blog-post-card">
           <div class="project-top">
-            <span class="project-badge" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); color: var(--accent-emerald);">
+            <span class="project-badge blog-post-badge-emerald">
               NETWORK DEFENSE
             </span>
-            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">
+            <span class="blog-post-read-time">
               8 min read
             </span>
           </div>
-          
-          <h2 style="font-size: 1.35rem; margin: 0.75rem 0 0.5rem; font-weight: 700;">
-            <a href="posts/pfsense-proxmox-isolated-lab.html" style="color: var(--text-main); text-decoration: none;">
+
+          <h2 class="blog-post-title">
+            <a href="posts/pfsense-proxmox-isolated-lab.html" class="blog-post-link">
               pfSense + Proxmox: Building an Isolated Virtual Lab Network
             </a>
           </h2>
-          
+
           <p class="project-desc">
             Complete guide on deploying a dedicated pfSense virtual gateway on Proxmox, configuring isolated Linux Bridges (vmbr1), DHCP routing for Active Directory, and WAN firewall hardening.
           </p>
-          
-          <div class="skill-tags" style="margin-bottom: 1.25rem;">
+
+          <div class="skill-tags blog-post-tags">
             <span class="tag highlight">pfSense</span>
             <span class="tag">Proxmox VE</span>
             <span class="tag">Network Isolation</span>
@@ -126,7 +126,7 @@
             <span class="tag">Firewall Rules</span>
           </div>
 
-          <div style="margin-top: auto; padding-top: 0.5rem;">
+          <div class="blog-post-action">
             <a href="posts/pfsense-proxmox-isolated-lab.html" class="btn btn-outline btn-sm">
               Read Lab Write-up <i class="fa-solid fa-arrow-right"></i>
             </a>
@@ -136,7 +136,7 @@
     </section>
 
     <!-- Return to Resume CTA -->
-    <div style="margin: 4rem 0 2rem; text-align: center;">
+    <div class="blog-index-cta">
       <a href="../index.html" class="btn btn-primary">
         <i class="fa-solid fa-user"></i> Back to Main Resume &amp; Profile
       </a>
@@ -146,7 +146,7 @@
   <footer>
     <div class="container">
       <p>© <span id="current-year">2026</span> Luis Baldera. Hosted securely with GitHub Pages.</p>
-      <p style="margin-top: 0.3rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);">
+      <p class="footer-details">
         Data Security • IAM • Microsoft Defender ATP • Entra ID • M365 Defensive Operations
       </p>
     </div>
