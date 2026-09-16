@@ -2,7 +2,7 @@
 
 🛡️ **Data Security, IAM & Microsoft 365 Security**  
 💻 **8+ Years Enterprise IT & Support Experience**  
-🔍 **Specializing in Microsoft Defender ATP, Entra ID & Least-Privilege Access**  
+🔍 **Specializing in Microsoft Defender XDR, Entra ID & Least-Privilege Access**  
 📜 **ISC2 Certified in Cybersecurity (CC) | Microsoft SC-900 (Scheduled)**  
 
 ---
@@ -38,7 +38,7 @@ To host this resume online:
 
 ## 🧰 Core Stack & Competencies
 
-- **Security Operations:** Microsoft Defender ATP, Sysmon, Incident Triage & Escalation, DLP (Purview)
+- **Security Operations:** Microsoft Defender XDR, Sysmon, Incident Triage & Escalation, DLP (Purview)
 - **Identity & Access Management:** Microsoft Entra ID (Azure AD), Active Directory, Conditional Access, MFA, Least-Privilege
 - **Cloud & Enterprise:** Microsoft 365 (Exchange, SharePoint, OneDrive, Teams), Windows Server, Proxmox VE, Intune
 - **Automation & ITSM:** PowerShell Scripting, ServiceNow, Jira, Zendesk, SOP Authoring
