@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detect Active Directory Attacks with Wazuh & Sysmon | Luis Baldera</title>
+  <meta name="description" content="Step-by-step guide to deploying Sysmon and integrating it with Wazuh to detect and analyze Active Directory attacks in your homelab environment.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../favicon.png">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../style.css">
+  <style>
+    .blog-article {
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.8;
+    }
+
+    .blog-article h2 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      color: var(--text-main);
+      border-bottom: 2px solid var(--accent-cyan);
+      padding-bottom: 0.5rem;
+    }
+
+    .blog-article h3 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      font-size: 1.2rem;
+      color: var(--accent-cyan);
+    }
+
+    .blog-article h4 {
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      font-size: 1.05rem;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .blog-article p {
+      color: var(--text-main);
+      margin-bottom: 1rem;
+    }
+
+    .blog-article code {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--accent-cyan);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+    }
+
+    .blog-article pre {
+      background: rgba(0, 0, 0, 0.3);
+      border-left: 3px solid var(--accent-cyan);
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    .blog-article pre code {
+      background: none;
+      color: #e0e0e0;
+      padding: 0;
+    }
+
+    .blog-article ul, .blog-article ol {
+      margin-left: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .blog-article li {
+      margin-bottom: 0.5rem;
+      color: var(--text-main);
+    }
+
+    .blog-article img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .blog-article blockquote {
+      border-left: 4px solid var(--accent-purple);
+      padding-left: 1rem;
+      margin-left: 0;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 1rem;
+    }
+
+    .blog-breadcrumb {
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+    }
+
+    .blog-breadcrumb a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+
+    .blog-breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    .blog-meta {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .blog-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .highlight-box {
+      background: rgba(56, 189, 248, 0.1);
+      border-left: 4px solid var(--accent-cyan);
+      padding: 1rem;
+      border-radius: 6px;
+      margin: 1.5rem 0;
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Decorations -->
+  <div class="bg-grid-overlay"></div>
+  <div class="bg-radial-glow"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="../../index.html" class="nav-brand" title="Return to Home">
+        <span class="nav-brand-icon"><img src="../../favicon.png" alt="Logo" style="width: 20px; height: 20px;"></span>
+        <span>lbcyberdefense</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Technical Write-ups</a></li>
+        <li><a href="../../resume.html">Resume</a></li>
+        <li><a href="../../index.html#connect">Connect</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button id="theme-toggle-btn" class="btn btn-outline btn-sm" aria-label="Toggle light and dark mode" title="Toggle theme">
+          <i id="theme-icon" class="fa-solid fa-sun"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="blog-article">
+      <div class="blog-breadcrumb">
+        <a href="../index.html"><i class="fa-solid fa-arrow-left"></i> Back to Blog</a>
+      </div>
+
+      <h1 style="margin-bottom: 0.5rem; font-size: 2rem;">Detect Active Directory Attacks with Wazuh &amp; Sysmon</h1>
+
+      <div class="blog-meta">
+        <span><i class="fa-solid fa-calendar"></i> July 29, 2024</span>
+        <span><i class="fa-solid fa-clock"></i> 15 min read</span>
+        <span style="color: var(--accent-cyan);"><i class="fa-solid fa-tag"></i> Threat Detection • Wazuh • Sysmon • AD Security</span>
+      </div>
+
+      <p style="font-size: 1.05rem; color: var(--text-muted); margin-bottom: 2rem;">
+        Learn how to integrate Sysmon telemetry with Wazuh to detect and investigate Active Directory attacks. This guide covers Sysmon deployment, agent configuration, and real-time threat detection across your AD infrastructure.
+      </p>
+
+      <div class="highlight-box">
+        <strong><i class="fa-solid fa-info-circle"></i> This guide is adapted from the official Wazuh blog:</strong> <a href="https://wazuh.com/blog/how-to-detect-active-directory-attacks-with-wazuh-part-2/" style="color: var(--accent-cyan);" target="_blank">How to Detect Active Directory Attacks with Wazuh - Part 2</a>
+      </div>
+
+      <h2><i class="fa-solid fa-circle-check"></i> Prerequisites</h2>
+      <p>Before deploying Sysmon and integrating with Wazuh, ensure:</p>
+      <ul>
+        <li><strong>Wazuh Manager:</strong> A running Wazuh deployment (on-premises or cloud)</li>
+        <li><strong>Windows Endpoints:</strong> Windows 10/11 or Windows Server machines joined to Active Directory</li>
+        <li><strong>Wazuh Agent:</strong> The Wazuh agent must be installed and running on target Windows systems</li>
+        <li><strong>Admin Rights:</strong> Administrator or equivalent privileges on Windows systems for Sysmon installation</li>
+        <li><strong>Internet Access:</strong> Required to download Sysmon and configuration files</li>
+      </ul>
+
+      <h2><i class="fa-solid fa-download"></i> Preparation: Download Required Tools</h2>
+
+      <h3>1. Download Sysmon</h3>
+      <p>Sysmon is a Windows system service and device driver that monitors system activity and logs it to the Windows event log. Download the latest version from Microsoft Sysinternals:</p>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon" style="color: var(--accent-cyan); text-decoration: none;" target="_blank">Sysinternals Sysmon Download</a></li>
+        <li>Extract <code>Sysmon64.exe</code> (or <code>Sysmon.exe</code> for 32-bit systems)</li>
+      </ul>
+
+      <h3>2. Download Sysmon Configuration</h3>
+      <p>A well-crafted Sysmon configuration file is essential for comprehensive monitoring. Use the community-maintained SwiftOnSecurity configuration:</p>
+      <ul>
+        <li><a href="https://github.com/SwiftOnSecurity/sysmon-config" style="color: var(--accent-cyan); text-decoration: none;" target="_blank">SwiftOnSecurity Sysmon-Modular Configuration</a></li>
+        <li>Download the <code>sysmonconfig.xml</code> file</li>
+      </ul>
+
+      <h3>3. Organize Files</h3>
+      <p>Create a directory and place both files together for easy installation:</p>
+      <pre><code>C:\Sysmon\
+  ├── Sysmon64.exe
+  └── sysmonconfig.xml</code></pre>
+
+      <h2><i class="fa-solid fa-gears"></i> Installation: Deploy Sysmon</h2>
+
+      <h3>Step 1: Open PowerShell as Administrator</h3>
+      <p>Right-click PowerShell and select <strong>"Run as Administrator"</strong>, then navigate to your Sysmon directory:</p>
+      <pre><code>cd C:\Sysmon</code></pre>
+
+      <h3>Step 2: Install Sysmon with Configuration</h3>
+      <p>Execute the following command to install Sysmon as a Windows service with the security-focused configuration:</p>
+      <pre><code>.\Sysmon64.exe -i .\sysmonconfig.xml -accepteula</code></pre>
+
+      <p><strong>What this command does:</strong></p>
+      <ul>
+        <li><code>-i</code>: Install Sysmon as a Windows service</li>
+        <li><code>.\sysmonconfig.xml</code>: Apply the SwiftOnSecurity configuration profile</li>
+        <li><code>-accepteula</code>: Automatically accept the Sysinternals EULA</li>
+      </ul>
+
+      <img src="../attachments/Detect AD attacks with Wazuh-1783304121075.webp" alt="Sysmon installation in PowerShell">
+      <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Sysmon installation command executed successfully</em></p>
+
+      <h2><i class="fa-solid fa-search-plus"></i> Verification: Confirm Sysmon is Running</h2>
+
+      <h3>Check the Sysmon Service</h3>
+      <p>Verify that Sysmon has been installed as a Windows service:</p>
+      <pre><code>Get-Service -Name "Sysmon64"</code></pre>
+
+      <p>You should see output indicating the service is running:</p>
+      <pre><code>Status   Name             DisplayName
+------   ----             -----------
+Running  Sysmon64         System Monitor</code></pre>
+
+      <h3>Check Event Viewer for Sysmon Logs</h3>
+      <p>Navigate to Event Viewer and verify that Sysmon is logging activity:</p>
+      <ul>
+        <li>Open <strong>Event Viewer</strong> (eventvwr.msc)</li>
+        <li>Navigate to: <strong>Applications and Services Logs</strong> &gt; <strong>Microsoft</strong> &gt; <strong>Windows</strong> &gt; <strong>Sysmon</strong> &gt; <strong>Operational</strong></li>
+        <li>Confirm you see event logs with IDs like Event 1 (Process creation), Event 3 (Network connection), etc.</li>
+      </ul>
+
+      <img src="../attachments/Detect AD attacks with Wazuh-1783304097675.webp" alt="Sysmon operational logs in Event Viewer">
+      <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Sysmon events captured in Event Viewer's Operational channel</em></p>
+
+      <img src="../attachments/Detect AD attacks with Wazuh-1783304206582.webp" alt="Detailed Sysmon event logs">
+      <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Detailed process creation and system events from Sysmon</em></p>
+
+      <h2><i class="fa-solid fa-link"></i> Wazuh Agent Configuration</h2>
+
+      <h3>Configure Wazuh to Ingest Sysmon Logs</h3>
+
+      <p>To collect Sysmon logs, you need to configure the Wazuh agent to monitor the Sysmon operational event log channel.</p>
+
+      <h4>Step 1: Locate the Wazuh Configuration File</h4>
+      <p>Open the Wazuh agent configuration file:</p>
+      <pre><code>C:\ProgramData\ossec\ossec.conf</code></pre>
+
+      <h4>Step 2: Add Sysmon Localfile Configuration</h4>
+      <p>Add the following configuration block to monitor the Microsoft-Windows-Sysmon/Operational channel. Insert this within the <code>&lt;ossec_config&gt;</code> tags:</p>
+      <pre><code>&lt;localfile&gt;
+    &lt;location&gt;Microsoft-Windows-Sysmon/Operational&lt;/location&gt;
+    &lt;log_format&gt;eventchannel&lt;/log_format&gt;
+&lt;/localfile&gt;</code></pre>
+
+      <p><strong>What this configuration does:</strong></p>
+      <ul>
+        <li><code>&lt;location&gt;</code>: Specifies the Windows event log channel to monitor</li>
+        <li><code>&lt;log_format&gt;</code>: Tells Wazuh this is an event channel (not a traditional text log)</li>
+      </ul>
+
+      <img src="../attachments/Detect AD attacks with Wazuh-1783304613417.webp" alt="Wazuh agent configuration with Sysmon">
+      <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Wazuh agent ossec.conf file updated with Sysmon monitoring</em></p>
+
+      <h4>Step 3: Restart the Wazuh Service</h4>
+      <p>Restart the Wazuh agent service to apply the configuration changes:</p>
+      <pre><code>Restart-Service -Name "Wazuh"</code></pre>
+
+      <p>Or manually restart via Services:</p>
+      <ul>
+        <li>Open <strong>Services.msc</strong></li>
+        <li>Find <strong>Wazuh</strong> in the list</li>
+        <li>Right-click and select <strong>Restart</strong></li>
+      </ul>
+
+      <h2><i class="fa-solid fa-flask-vial"></i> Testing: Generate Sysmon Activity</h2>
+
+      <h3>Create Observable Process Activity</h3>
+      <p>Now let's generate some activity for Sysmon to capture and Wazuh to ingest. Open PowerShell and run commands that will be logged:</p>
+
+      <img src="../attachments/Detect AD attacks with Wazuh-1783304790079.webp" alt="PowerShell commands triggering Sysmon events">
+      <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Executing PowerShell commands that trigger Sysmon event logging</em></p>
+
+      <h3>Trigger a Process Creation Event</h3>
+      <p>Execute this command to spawn a cmd.exe process, which will be captured by Sysmon as Event ID 1 (Process Creation):</p>
+      <pre><code>Start-Process cmd</code></pre>
+
+      <p>This simple command will create observable telemetry that Sysmon logs and Wazuh can ingest.</p>
+
+      <h2><i class="fa-solid fa-chart-line"></i> Verification: Wazuh Ingesting Sysmon Logs</h2>
+
+      <p>Check the Wazuh Manager to confirm it's receiving and processing Sysmon logs from your endpoint.</p>
+
+      <img src="../attachments/Detect AD attacks with Wazuh-1783306738300.webp" alt="Wazuh dashboard showing ingested Sysmon logs">
+      <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Wazuh dashboard displaying process creation events from Sysmon</em></p>
+
+      <img src="../attachments/Detect AD attacks with Wazuh-1783306769489.webp" alt="Detailed Sysmon event analysis in Wazuh">
+      <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Detailed breakdown of a Sysmon Event ID 1 (Process Creation) in Wazuh</em></p>
+
+      <h2><i class="fa-solid fa-shield-halved"></i> What's Next: Building Detection Rules</h2>
+
+      <p>Now that Sysmon is integrated with Wazuh, you can build powerful detection rules for:</p>
+
+      <ul>
+        <li><strong>Active Directory Attacks:</strong> Detect AD enumeration, credential dumping, lateral movement</li>
+        <li><strong>Process Injection:</strong> Identify suspicious process hollowing and injection techniques</li>
+        <li><strong>Privilege Escalation:</strong> Monitor for UAC bypasses and privilege escalation attempts</li>
+        <li><strong>Living-off-the-Land Attacks:</strong> Detect abuse of built-in Windows tools (LOLBins)</li>
+        <li><strong>Network Reconnaissance:</strong> Monitor DNS queries, port scans, and lateral connection attempts</li>
+      </ul>
+
+      <h2><i class="fa-solid fa-lightbulb"></i> Pro Tips</h2>
+
+      <ul>
+        <li><strong>Performance Impact:</strong> Sysmon and Wazuh agent are lightweight, but monitor system performance on resource-constrained VMs</li>
+        <li><strong>Configuration Tuning:</strong> The SwiftOnSecurity configuration is comprehensive. Fine-tune it based on your homelab needs</li>
+        <li><strong>Retention Policy:</strong> Configure log retention on your Wazuh manager to avoid disk space issues</li>
+        <li><strong>Alert Tuning:</strong> Start with broad detection rules and refine them to reduce false positives</li>
+        <li><strong>Testing Environment:</strong> Use a test machine to validate detection rules before deploying to production</li>
+      </ul>
+
+      <h2><i class="fa-solid fa-book"></i> Resources</h2>
+
+      <ul>
+        <li><a href="https://wazuh.com/blog/how-to-detect-active-directory-attacks-with-wazuh-part-2/" style="color: var(--accent-cyan); text-decoration: none;" target="_blank">Wazuh Blog: How to Detect Active Directory Attacks with Wazuh - Part 2</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon" style="color: var(--accent-cyan); text-decoration: none;" target="_blank">Microsoft Sysinternals: Sysmon</a></li>
+        <li><a href="https://github.com/SwiftOnSecurity/sysmon-config" style="color: var(--accent-cyan); text-decoration: none;" target="_blank">SwiftOnSecurity: Sysmon Modular Configuration</a></li>
+        <li><a href="https://documentation.wazuh.com/" style="color: var(--accent-cyan); text-decoration: none;" target="_blank">Wazuh Official Documentation</a></li>
+      </ul>
+
+      <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          Have questions or insights on AD security? Reach out via <a href="mailto:luis@lbcyberdefense.com" style="color: var(--accent-cyan); text-decoration: none;">email</a> or connect on <a href="https://www.linkedin.com/in/luis-baldera/" style="color: var(--accent-cyan); text-decoration: none;" target="_blank">LinkedIn</a>.
+        </p>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© <span id="current-year">2026</span> Luis Baldera. Hosted securely with GitHub Pages.</p>
+      <p style="margin-top: 0.3rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);">
+        Data Security • IAM • Microsoft Defender XDR • Entra ID • M365 Defensive Operations
+      </p>
+      <p style="margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.75rem;">
+        <a href="../../privacy.html" style="color: var(--accent-cyan); text-decoration: none;">Privacy Notice</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../script.js"></script>
+</body>
+</html>

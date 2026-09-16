@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wazuh in Proxmox: Deploying SIEM in Your Homelab | Luis Baldera</title>
+  <meta name="description" content="Step-by-step guide to deploying Wazuh security monitoring and SIEM platform on Proxmox VE, including port configuration and CasaOS integration.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../favicon.png">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../style.css">
+  <style>
+    .blog-article {
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.8;
+    }
+
+    .blog-article h2 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      color: var(--text-main);
+      border-bottom: 2px solid var(--accent-cyan);
+      padding-bottom: 0.5rem;
+    }
+
+    .blog-article h3 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      font-size: 1.2rem;
+      color: var(--accent-cyan);
+    }
+
+    .blog-article p {
+      color: var(--text-main);
+      margin-bottom: 1rem;
+    }
+
+    .blog-article code {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--accent-cyan);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+    }
+
+    .blog-article pre {
+      background: rgba(0, 0, 0, 0.3);
+      border-left: 3px solid var(--accent-cyan);
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    .blog-article pre code {
+      background: none;
+      color: #e0e0e0;
+      padding: 0;
+    }
+
+    .blog-article ul, .blog-article ol {
+      margin-left: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .blog-article li {
+      margin-bottom: 0.5rem;
+      color: var(--text-main);
+    }
+
+    .blog-article img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .blog-article blockquote {
+      border-left: 4px solid var(--accent-purple);
+      padding-left: 1rem;
+      margin-left: 0;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 1rem;
+    }
+
+    .blog-breadcrumb {
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+    }
+
+    .blog-breadcrumb a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+
+    .blog-breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    .blog-meta {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .blog-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Decorations -->
+  <div class="bg-grid-overlay"></div>
+  <div class="bg-radial-glow"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="../../index.html" class="nav-brand" title="Return to Home">
+        <span class="nav-brand-icon"><img src="../../favicon.png" alt="Logo" style="width: 20px; height: 20px;"></span>
+        <span>lbcyberdefense</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Technical Write-ups</a></li>
+        <li><a href="../../resume.html">Resume</a></li>
+        <li><a href="../../index.html#connect">Connect</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button id="theme-toggle-btn" class="btn btn-outline btn-sm" aria-label="Toggle light and dark mode" title="Toggle theme">
+          <i id="theme-icon" class="fa-solid fa-sun"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="blog-article">
+      <div class="blog-breadcrumb">
+        <a href="../index.html"><i class="fa-solid fa-arrow-left"></i> Back to Blog</a>
+      </div>
+
+      <h1 style="margin-bottom: 0.5rem; font-size: 2rem;">Wazuh in Proxmox: Deploying SIEM in Your Homelab</h1>
+
+      <div class="blog-meta">
+        <span><i class="fa-solid fa-calendar"></i> July 29, 2024</span>
+        <span><i class="fa-solid fa-clock"></i> 12 min read</span>
+        <span style="color: var(--accent-cyan);"><i class="fa-solid fa-tag"></i> SIEM • Wazuh • Proxmox</span>
+      </div>
+
+      <p style="font-size: 1.05rem; color: var(--text-muted); margin-bottom: 2rem;">
+        Learn how to deploy Wazuh, a comprehensive SIEM and threat detection platform, as a virtual machine on Proxmox VE. This guide covers installation, configuration, and integration with other homelab services.
+      </p>
+
+      <h2><i class="fa-solid fa-circle-check"></i> Prerequisites</h2>
+      <p>Before you begin, ensure the following:</p>
+      <ul>
+        <li><strong>Proxmox Environment:</strong> A running Proxmox VE cluster or standalone node with sufficient resources</li>
+        <li><strong>Ubuntu VM:</strong> An Ubuntu Server VM (20.04 LTS or later) with internet access</li>
+        <li><strong>Resources:</strong> Minimum 4 vCPUs, 8GB RAM, and 60GB storage (16GB+ RAM recommended for optimal performance)</li>
+        <li><strong>Network:</strong> VM must be able to reach the internet and communicate with other lab endpoints</li>
+      </ul>
+
+      <h2><i class="fa-solid fa-download"></i> System Update &amp; Dependencies</h2>
+      <p>Start by updating your system and installing necessary tools:</p>
+      <pre><code>sudo apt update && sudo apt upgrade -y
+sudo apt install curl unzip -y</code></pre>
+
+      <h2><i class="fa-solid fa-gears"></i> Installation Steps</h2>
+
+      <h3>1. Download the Installation Assistant</h3>
+      <p>Run the following command to download the official Wazuh installation script:</p>
+      <pre><code>curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh</code></pre>
+
+      <h3>2. Run the Assisted Installation</h3>
+      <p>The <code>-a</code> flag runs the "all-in-one" installation, which sets up the Wazuh Indexer, the Wazuh Server (Manager), and the Wazuh Dashboard automatically:</p>
+      <pre><code>sudo bash ./wazuh-install.sh -a</code></pre>
+      <p><strong>Note:</strong> This process usually takes 10–20 minutes to complete. Be patient and let it finish fully.</p>
+
+      <h3>3. Retrieve Your Credentials</h3>
+      <p>Once the installation finishes, the script will output the results, including your access credentials. If you need to retrieve them later, extract them from the installation files:</p>
+      <pre><code>sudo tar -O -xvf wazuh-install-files.tar wazuh-install-files/wazuh-passwords.txt</code></pre>
+
+      <h3>4. Access the Dashboard</h3>
+      <p>Once installation completes:</p>
+      <ul>
+        <li>Open your web browser and navigate to <code>https://&lt;YOUR_VM_IP_ADDRESS&gt;</code></li>
+        <li>Log in with the username <strong>admin</strong> and the password provided in the installation output</li>
+      </ul>
+
+      <img src="../attachments/Wazuh in Proxmox-1783219582806.webp" alt="Wazuh GUI running after initial installation">
+      <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Wazuh GUI running after initial installation</em></p>
+
+      <h2><i class="fa-solid fa-lightbulb"></i> Pro-Tips for Your Environment</h2>
+      <ul>
+        <li><strong>Monitoring Logs:</strong> If you run into issues during install, check logs at <code>/var/log/wazuh-install.log</code></li>
+        <li><strong>Resource Management:</strong> Wazuh can be memory-intensive. If your VM crashes, ensure you've allocated sufficient RAM (8GB+ recommended)</li>
+        <li><strong>Next Steps:</strong> Once the dashboard is up, you can start protecting endpoints by deploying the <strong>Wazuh Agent</strong> on them</li>
+      </ul>
+
+      <h2><i class="fa-solid fa-triangle-exclamation"></i> Port Conflicts: Managing CasaOS &amp; Other Services</h2>
+
+      <p>If you have other services running on your Ubuntu server (like CasaOS), they may conflict with Wazuh's ports. Here's how to resolve port conflicts:</p>
+
+      <h3>How to Change the CasaOS Port</h3>
+
+      <p>CasaOS typically runs its web interface on port 80/443. You can change this by modifying the configuration files:</p>
+
+      <h4>1. Stop the CasaOS Web Service</h4>
+      <p>Stop the service before changing the configuration:</p>
+      <pre><code>sudo systemctl stop casaos-gateway</code></pre>
+
+      <h4>2. Edit the Configuration File</h4>
+      <p>The configuration file is typically located at <code>/etc/casaos/gateway.conf</code>. Open it with a text editor:</p>
+      <pre><code>sudo nano /etc/casaos/gateway.conf</code></pre>
+      <p>Look for the <code>port</code> or <code>listen</code> parameter and change it from <code>80</code> (or <code>443</code>) to a custom port, such as <code>8080</code>.</p>
+
+      <h4>3. Restart the Service</h4>
+      <p>Once saved, restart the gateway service to apply the change:</p>
+      <pre><code>sudo systemctl start casaos-gateway</code></pre>
+
+      <h4>4. Access Your Services</h4>
+      <ul>
+        <li><strong>Wazuh:</strong> Will remain on the standard port (443)</li>
+        <li><strong>CasaOS:</strong> Will be accessible at <code>http://&lt;YOUR_VM_IP_ADDRESS&gt;:8080</code></li>
+      </ul>
+
+      <h3>Alternative Configuration Paths</h3>
+      <p>If the first path doesn't work, try these alternatives:</p>
+      <ul>
+        <li><strong>CasaOS Config File:</strong> <code>/etc/casaos/casaos.conf</code>
+          <ul>
+            <li>Command: <code>sudo nano /etc/casaos/casaos.conf</code></li>
+            <li>Look for a line specifying <code>PORT=80</code> and change it to your desired port (e.g., <code>PORT=8080</code>)</li>
+          </ul>
+        </li>
+        <li><strong>Gateway-Specific File:</strong> <code>/etc/casaos/gateway/gateway.ini</code>
+          <ul>
+            <li>Command: <code>sudo nano /etc/casaos/gateway/gateway.ini</code></li>
+            <li>Find the line <code>port = 80</code> and change the number to your new port</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>After Modifying the Configuration</h3>
+      <p>Once you've saved the file (Press <code>Ctrl + X</code>, then <code>Y</code>, then <code>Enter</code>), restart CasaOS:</p>
+      <pre><code>sudo systemctl restart casaos</code></pre>
+
+      <p>Verify the new port is active:</p>
+      <pre><code>sudo netstat -tulnp | grep casaos</code></pre>
+
+      <img src="../attachments/Wazuh in Proxmox-1783219980850.webp" alt="CasaOS running on selected port">
+      <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>CasaOS successfully running on custom port (will be removed to dedicate resources to Wazuh)</em></p>
+
+      <h2><i class="fa-solid fa-star"></i> Next Steps</h2>
+      <ul>
+        <li><strong>Deploy Wazuh Agents:</strong> Install the Wazuh agent on your domain controller, workstations, and other endpoints</li>
+        <li><strong>Configure Log Sources:</strong> Point Wazuh to relevant log sources (Windows Event Logs, Sysmon, application logs)</li>
+        <li><strong>Create Detection Rules:</strong> Build custom detection rules tailored to your homelab environment</li>
+        <li><strong>Monitor &amp; Alert:</strong> Set up automated alerts for suspicious activity and anomalies</li>
+      </ul>
+
+      <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          Have questions or run into issues? Reach out via <a href="mailto:luis@lbcyberdefense.com" style="color: var(--accent-cyan); text-decoration: none;">email</a> or connect on <a href="https://www.linkedin.com/in/luis-baldera/" style="color: var(--accent-cyan); text-decoration: none;" target="_blank">LinkedIn</a>.
+        </p>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© <span id="current-year">2026</span> Luis Baldera. Hosted securely with GitHub Pages.</p>
+      <p style="margin-top: 0.3rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);">
+        Data Security • IAM • Microsoft Defender XDR • Entra ID • M365 Defensive Operations
+      </p>
+      <p style="margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.75rem;">
+        <a href="../../privacy.html" style="color: var(--accent-cyan); text-decoration: none;">Privacy Notice</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../script.js"></script>
+</body>
+</html>
