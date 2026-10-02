@@ -1,0 +1,14 @@
+# Robots.txt for lbcyberdefense.com
+# Allow all search engines to crawl and index content
+
+User-agent: *
+Allow: /
+Disallow: /.git/
+Disallow: /.well-known/
+Disallow: /privacy.html  # Optional: keep private policy out of search results
+
+# Sitemaps
+Sitemap: https://lbcyberdefense.com/sitemap.xml
+
+# Crawl delay (optional, helps with server load)
+Crawl-delay: 1
