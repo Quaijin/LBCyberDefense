@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniRoute + Claude: Setting Up AI Model Routing | Luis Baldera</title>
+  <meta name="description" content="Complete guide to configuring OmniRoute for unified AI model routing with Claude and other LLMs through a local interface with RoundRobin strategy.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../favicon.png">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <!-- Background Decorations -->
+  <div class="bg-grid-overlay"></div>
+  <div class="bg-radial-glow"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="../../index.html" class="nav-brand" title="Return to Home">
+        <span class="nav-brand-icon"><img src="../../favicon.png" alt="Logo" style="width: 20px; height: 20px;"></span>
+        <span>lbcyberdefense</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../index.html" class="nav-link-active">Technical Write-ups</a></li>
+        <li><a href="../../resume.html">Resume</a></li>
+        <li><a href="../../index.html#connect">Connect</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button id="theme-toggle-btn" class="btn btn-outline btn-sm" aria-label="Toggle light and dark mode" title="Toggle theme">
+          <i id="theme-icon" class="fa-solid fa-sun"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="article-content">
+      <!-- Breadcrumb -->
+      <div style="margin-top: 2rem; font-family: var(--font-mono); font-size: 0.85rem;">
+        <a href="../index.html" style="color: var(--accent-cyan); text-decoration: none;">
+          <i class="fa-solid fa-arrow-left"></i> Back to All Lab Write-ups
+        </a>
+      </div>
+
+      <!-- Article Header -->
+      <header class="blog-header">
+        <div class="status-badge" style="margin-bottom: 0.8rem;">
+          <span class="pulse-dot"></span>
+          <span>AI INTEGRATION & TOOLING</span>
+        </div>
+        <h1 style="font-size: 2.35rem; line-height: 1.25; font-weight: 800; margin-bottom: 0.75rem;">
+          OmniRoute + Claude: Setting Up AI Model Routing
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">
+          Configure OmniRoute to unify access to multiple AI models including Claude, with intelligent load balancing and fallback strategies through a local interface.
+        </p>
+
+        <div class="blog-meta">
+          <span><i class="fa-regular fa-calendar"></i> AI Integration & Development</span>
+          <span><i class="fa-regular fa-clock"></i> 12 min read</span>
+          <span><i class="fa-solid fa-tag" style="color: var(--accent-cyan);"></i> OmniRoute, Claude AI, LLM Integration, AI Routing</span>
+        </div>
+      </header>
+
+      <!-- Main Article Body -->
+      <div class="card" style="margin-bottom: 2.5rem; padding: 2rem;">
+        <p>
+          <strong>OmniRoute</strong> is a powerful tool for managing multiple AI model providers through a unified interface. In this guide, we'll set up OmniRoute to route requests to Claude and other LLMs with intelligent load balancing using a <strong>RoundRobin strategy</strong>. This approach allows you to leverage multiple free and paid AI providers while maintaining a single integration point.
+        </p>
+
+        <h2>Step 1 – Install Node.js</h2>
+        <p>
+          OmniRoute requires Node.js to run. Download and install the latest LTS version from the official Node.js website.
+        </p>
+        <p>
+          <a href="https://nodejs.org/en/download" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan);">Download Node.js</a>
+        </p>
+
+        <h2>Step 2 – Install OmniRoute</h2>
+        <p>
+          Once Node.js is installed, proceed to the OmniRoute official website to download and install OmniRoute.
+        </p>
+        <p>
+          <a href="https://omniroute.online/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan);">OmniRoute Official Website</a>
+        </p>
+
+        <h2>Step 3 – Install Visual Studio Code</h2>
+        <p>
+          We'll use Visual Studio Code as our terminal environment for launching and managing OmniRoute. Download the latest version from the official site.
+        </p>
+        <p>
+          <a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan);">Download Visual Studio Code</a>
+        </p>
+
+        <h2>Step 4 – Launch OmniRoute from VS Code Terminal</h2>
+        <p>
+          Open Visual Studio Code and launch a terminal. From the terminal, execute the OmniRoute launcher:
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825194753.png" alt="OmniRoute launching from VS Code terminal">
+          <div class="article-image-caption">Figure 1: Launching OmniRoute from the terminal</div>
+        </div>
+
+        <h2>Step 5 – Access OmniRoute Dashboard</h2>
+        <p>
+          Once OmniRoute is running, open your browser and navigate to the local address displayed in the terminal output. The initial setup page will display the temporary password needed to access the dashboard.
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825194655.png" alt="OmniRoute initial setup screen with password">
+          <div class="article-image-caption">Figure 2: Initial OmniRoute setup screen with temporary password</div>
+        </div>
+
+        <p>
+          Enter the displayed password and click <strong>Continue</strong> to proceed to the dashboard:
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825195002.png" alt="OmniRoute password entry screen">
+          <div class="article-image-caption">Figure 3: Enter the temporary password to access dashboard</div>
+        </div>
+
+        <h2>Step 6 – Add AI Providers</h2>
+        <p>
+          In the OmniRoute dashboard, you can add multiple AI model providers. For this guide, we'll add Antigravity and Kiro AI (which provides Claude models):
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825195250.png" alt="OmniRoute providers selection interface">
+          <div class="article-image-caption">Figure 4: Adding AI providers in OmniRoute</div>
+        </div>
+
+        <p>
+          After adding providers, you can test them to verify they're working correctly:
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825195402.png" alt="Testing OmniRoute providers">
+          <div class="article-image-caption">Figure 5: Testing provider connections</div>
+        </div>
+
+        <p>
+          <strong>Connecting to Claude via Kiro AI:</strong> Select Google as your authentication method to connect Kiro AI, which provides access to Claude models:
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825195928.png" alt="Kiro AI provider configuration">
+          <div class="article-image-caption">Figure 6: Configuring Kiro AI provider with Google authentication</div>
+        </div>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825195842.png" alt="Claude model selection in Kiro AI">
+          <div class="article-image-caption">Figure 7: Claude models available through Kiro AI</div>
+        </div>
+
+        <h2>Step 7 – Add Additional Free Providers</h2>
+        <p>
+          To maximize your available models, consider adding these free or low-cost providers:
+        </p>
+        <ul>
+          <li><strong>NVIDIA NIM:</strong> Free API with excellent models (create a free developer account at <a href="https://build.nvidia.com/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan);">build.nvidia.com</a>)</li>
+          <li><strong>OpenRouter:</strong> Unified interface for multiple models (manage keys at <a href="https://openrouter.ai/workspaces/default/keys" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan);">openrouter.ai</a>)</li>
+          <li><strong>OpenCode Free:</strong> Free tier access to various models</li>
+        </ul>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825195643.png" alt="Additional provider configuration">
+          <div class="article-image-caption">Figure 8: Configuring additional free providers (NVIDIA NIM, OpenRouter, OpenCode)</div>
+        </div>
+
+        <h2>Step 8 – Create a Combo Flow</h2>
+        <p>
+          A "Combo Flow" in OmniRoute allows you to combine multiple providers and models under a single routing strategy. Click to create a new combo:
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825200251.png" alt="OmniRoute combo flow creation">
+          <div class="article-image-caption">Figure 9: Creating a new Combo flow</div>
+        </div>
+
+        <p>
+          Select the default free template and proceed to model selection:
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825200338.png" alt="Combo template selection">
+          <div class="article-image-caption">Figure 10: Selecting the default combo template</div>
+        </div>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825200446.png" alt="Model selection for combo">
+          <div class="article-image-caption">Figure 11: Selecting models from your configured providers</div>
+        </div>
+
+        <p>
+          <strong>Arrange Model Priority:</strong> The order of models in the combo determines their execution sequence. Use the arrow controls to reorder them:
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825200522.png" alt="Model ordering in combo">
+          <div class="article-image-caption">Figure 12: Reordering models using arrow controls</div>
+        </div>
+
+        <p>
+          <strong>Configure Routing Strategy:</strong> Proceed to the Strategy step and select <strong>RoundRobin</strong>. This strategy cycles through your models sequentially, distributing load evenly and providing automatic fallback if one provider fails:
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825200719.png" alt="RoundRobin strategy confirmation">
+          <div class="article-image-caption">Figure 13: Combo created with RoundRobin strategy</div>
+        </div>
+
+        <p>
+          Complete the combo creation wizard and your multi-model routing configuration is ready.
+        </p>
+
+        <h2>Step 9 – Generate API Key</h2>
+        <p>
+          OmniRoute generates an API key that you'll use to authenticate requests. Create and copy this key for use with Claude Code:
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825200833.png" alt="OmniRoute API key generation">
+          <div class="article-image-caption">Figure 14: Generate and copy your OmniRoute API key</div>
+        </div>
+
+        <h2>Step 10 – Configure Claude Code with OmniRoute</h2>
+        <p>
+          Before running Claude for the first time, configure environment variables to point to your OmniRoute instance. First, install Claude from the official quickstart guide:
+        </p>
+
+        <p>
+          <a href="https://code.claude.com/docs/en/quickstart" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan);">Claude Code Quickstart Documentation</a>
+        </p>
+
+        <p>
+          After installation, set the following environment variables in your terminal:
+        </p>
+
+        <h3>For Windows (PowerShell):</h3>
+        <pre><code>$env:CLAUDE_CONFIG_DIR = "$HOME\.claude-omniroute"
+$env:ANTHROPIC_BASE_URL = "http://localhost:20128"
+$env:ANTHROPIC_AUTH_TOKEN = "API_Key_You_Created"
+$env:ANTHROPIC_API_KEY = ""
+$env:ANTHROPIC_MODEL = "Combo_Name"</code></pre>
+
+        <h3>For Linux/macOS (Bash):</h3>
+        <pre><code>export CLAUDE_CONFIG_DIR="$HOME/.claude-omniroute"
+export ANTHROPIC_BASE_URL="http://localhost:20128"
+export ANTHROPIC_AUTH_TOKEN="API_Key_You_Created"
+export ANTHROPIC_API_KEY=""
+export ANTHROPIC_MODEL="Combo_Name"</code></pre>
+
+        <div class="highlight-box">
+          <strong>Important Notes:</strong>
+          <ul style="margin: 0.5rem 0 0 1.25rem;">
+            <li>Replace <code>API_Key_You_Created</code> with the key generated in Step 9</li>
+            <li>Replace <code>Combo_Name</code> with the name of the combo you created in Step 8</li>
+            <li>Leave <code>ANTHROPIC_API_KEY</code> empty (empty string)</li>
+            <li>If all variables are set correctly, the terminal will return no output</li>
+          </ul>
+        </div>
+
+        <p>
+          You can now launch Claude Code. It will display the combo model you configured as the active model:
+        </p>
+
+        <div class="article-image-container">
+          <img src="../attachments/Pasted-image-20260825201650.png" alt="Claude running with OmniRoute combo model">
+          <div class="article-image-caption">Figure 15: Claude Code running with OmniRoute combo model active</div>
+        </div>
+
+        <h2>Key Benefits of This Setup</h2>
+        <ul>
+          <li><strong>Unified Interface:</strong> Access multiple AI models through a single endpoint</li>
+          <li><strong>Load Balancing:</strong> RoundRobin strategy distributes requests across models</li>
+          <li><strong>Automatic Fallback:</strong> If one provider fails, requests route to the next model</li>
+          <li><strong>Cost Optimization:</strong> Mix free and paid providers for cost-effective scaling</li>
+          <li><strong>Flexibility:</strong> Easily add, remove, or reorder providers and models</li>
+        </ul>
+
+        <div class="highlight-box" style="margin-top: 2rem;">
+          <strong>Recommended Resources:</strong><br>
+          <a href="https://github.com/diegosouzapw/OmniRoute" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan);">
+            OmniRoute GitHub Repository
+          </a> – Complete source code and detailed documentation
+        </div>
+      </div>
+
+      <!-- Footer navigation -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 3rem 0;">
+        <a href="../index.html" class="btn btn-outline">
+          <i class="fa-solid fa-arrow-left"></i> All Articles
+        </a>
+      </div>
+    </article>
+  </main>
+
+    <footer>
+    <div class="container">
+      <p>© <span id="current-year">2026</span> Luis Baldera. Hosted securely with GitHub Pages.</p>
+      <p style="margin-top: 0.3rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);">
+        Data Security • IAM • Microsoft Defender XDR • Entra ID • M365 Defensive Operations
+      </p>
+      <p style="margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.75rem;">
+        <a href="../../privacy.html" style="color: var(--accent-cyan); text-decoration: none;">Privacy Notice</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../script.js"></script>
+</body>
+</html>
