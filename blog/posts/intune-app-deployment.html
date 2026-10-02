@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deploying Apps via Intune | Luis Baldera</title>
+  <meta name="description" content="Step-by-step guide on deploying Windows applications through Microsoft Intune's Company Portal using device management policies.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../favicon.png">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+  <!-- Background Decorations -->
+  <div class="bg-grid-overlay"></div>
+  <div class="bg-radial-glow"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="../../index.html" class="nav-brand" title="Return to Home">
+        <span class="nav-brand-icon"><img src="../../favicon.png" alt="Logo" style="width: 20px; height: 20px;"></span>
+        <span>lbcyberdefense</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../index.html" class="nav-link-active">Technical Write-ups</a></li>
+        <li><a href="../../resume.html">Resume</a></li>
+        <li><a href="../../index.html#connect">Connect</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button id="theme-toggle-btn" class="btn btn-outline btn-sm" aria-label="Toggle light and dark mode" title="Toggle theme">
+          <i id="theme-icon" class="fa-solid fa-sun"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="article-content">
+      <!-- Breadcrumb Navigation -->
+      <nav style="margin-top: 2rem; font-family: var(--font-mono); font-size: 0.85rem;">
+        <a href="../index.html" style="color: var(--accent-cyan); text-decoration: none;">Blog</a>
+        <span style="color: var(--text-dim); margin: 0 0.5rem;">/</span>
+        <a href="../index.html#microsoft365" style="color: var(--accent-cyan); text-decoration: none;">Microsoft 365 Administration</a>
+        <span style="color: var(--text-dim); margin: 0 0.5rem;">/</span>
+        <span style="color: var(--text-muted);">Deploying Apps via Intune</span>
+      </nav>
+
+      <!-- Article Header -->
+      <header class="blog-header">
+        <div class="status-badge" style="margin-bottom: 0.8rem;">
+          <span class="pulse-dot"></span>
+          <span>MICROSOFT 365 ADMINISTRATION & SECURITY</span>
+        </div>
+        <h1 style="font-size: 2.35rem; line-height: 1.25; font-weight: 800; margin-bottom: 0.75rem;">
+          Deploying Apps via Intune
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">
+          Implement application management through Microsoft Intune Company Portal using device policies and deployment groups.
+        </p>
+
+        <div class="blog-meta">
+          <span><i class="fa-regular fa-calendar"></i> Microsoft 365 Administration</span>
+          <span><i class="fa-regular fa-clock"></i> 8 min read</span>
+          <span><i class="fa-solid fa-tag" style="color: #10b981;"></i> Intune, MDM, Application Management, Company Portal</span>
+        </div>
+      </header>
+
+      <!-- Main Article Body -->
+      <div class="card" style="margin-bottom: 2.5rem; padding: 2rem;">
+        <p>
+          This guide demonstrates how to deploy Windows applications through Microsoft Intune's Company Portal platform.
+          We'll walk through device policy configuration, application selection, deployment group assignment, and client installation verification.
+        </p>
+
+        <h2>1. Initial Device Policy Configuration</h2>
+        <p>
+          Before deploying applications, establish a device policy to enforce Microsoft Store restrictions and prepare for application deployment.
+        </p>
+        <div class="article-image-container">
+          <img src="../attachments/App Deploy via Company Portal-1790913205705.webp" alt="Device Policy to block Windows Microsoft Store">
+          <div class="article-image-caption">Figure 1: Device policy configured to block Microsoft Store access</div>
+        </div>
+
+        <h2>2. Client Testing and Verification</h2>
+        <p>
+          Test the policy application on client machines to ensure device compliance and policy propagation.
+        </p>
+        <div class="article-image-container">
+          <img src="../attachments/App Deploy via Company Portal-1790913228962.webp" alt="Client test verification">
+          <div class="article-image-caption">Figure 2: Policy compliance verification on enrolled client</div>
+        </div>
+
+        <h2>3. Company Portal as Software Deployment Platform</h2>
+        <p>
+          The Company Portal serves as the central hub for end-user access to managed applications. All deployed apps appear here for optional installation or mandatory enforcement.
+        </p>
+        <div class="article-image-container">
+          <img src="../attachments/App Deploy via Company Portal-1790913519312.webp" alt="Company Portal as software deployment platform">
+          <div class="article-image-caption">Figure 3: Company Portal displaying deployed applications to end users</div>
+        </div>
+
+        <h2>4. Testing Application Deployment</h2>
+        <p>
+          Deploy a test application (Adobe Reader) to verify the deployment pipeline and installation workflow.
+        </p>
+        <div class="article-image-container">
+          <img src="../attachments/App Deploy via Company Portal-1790913529453.webp" alt="Adobe Reader as the first test app deployed">
+          <div class="article-image-caption">Figure 4: Adobe Reader successfully deployed as test application</div>
+        </div>
+
+        <h2>5. Managing Windows Applications in Intune</h2>
+        <p>
+          Access the Windows App list within Intune to view, manage, and add new applications to your deployment catalog.
+        </p>
+        <div class="article-image-container">
+          <img src="../attachments/App Deploy via Company Portal-1790911885757.webp" alt="Windows App list in Intune">
+          <div class="article-image-caption">Figure 5: Windows Applications management console in Intune</div>
+        </div>
+
+        <h2>6. Adding New Applications to Deployment</h2>
+
+        <h3>Step 1: Select Application Type</h3>
+        <p>
+          When adding applications, choose the appropriate application type (Store App, Web Link, Win32 App, etc.). For store-based applications, select "Store app" as the application type.
+        </p>
+        <div class="article-image-container">
+          <img src="../attachments/App Deploy via Company Portal-1790911902819.webp" alt="Adding more Apps - App type selection">
+          <div class="article-image-caption">Figure 6: Application type selection interface</div>
+        </div>
+
+        <h3>Step 2: Search and Select Store Application</h3>
+        <p>
+          Search the Microsoft Store catalog for the desired application. In this example, we're deploying Brave Browser.
+        </p>
+        <div class="article-image-container">
+          <img src="../attachments/App Deploy via Company Portal-1790911915462.webp" alt="Store app selection">
+          <div class="article-image-caption">Figure 7: Store application catalog for application selection</div>
+        </div>
+
+        <h3>Step 3: Configure Deployment Group Assignment</h3>
+        <p>
+          Assign the application to security groups to control which users and devices receive the deployment. Create or select an existing security group for targeted deployment.
+        </p>
+        <div class="article-image-container">
+          <img src="../attachments/App Deploy via Company Portal-1790911944339.webp" alt="Brave Browser selection">
+          <div class="article-image-caption">Figure 8: Brave Browser selected for deployment</div>
+        </div>
+
+        <h3>Step 4: Security Group Assignment</h3>
+        <p>
+          Specify security groups for application assignment. This ensures only members of the deployment group can access the application through Company Portal.
+        </p>
+        <div class="article-image-container">
+          <img src="../attachments/App Deploy via Company Portal-1790911958750.webp" alt="SecGroup for deployment">
+          <div class="article-image-caption">Figure 9: Security group assignment for application deployment</div>
+        </div>
+
+        <h2>7. Application Logo Configuration</h2>
+        <p>
+          Upload a custom application logo to enhance the visual presentation of applications in the Company Portal. This improves user experience and brand consistency.
+        </p>
+        <div class="article-image-container">
+          <img src="../attachments/App Deploy via Company Portal-1790911995881.webp" alt="App logo configuration">
+          <div class="article-image-caption">Figure 10: Custom logo upload for application branding</div>
+        </div>
+
+        <h2>8. Verification and Deployment Status</h2>
+
+        <h3>Application List Post-Upload</h3>
+        <p>
+          After uploading applications, verify they appear in your managed applications list with correct metadata.
+        </p>
+        <div class="article-image-container">
+          <img src="../attachments/App Deploy via Company Portal-1790912046157.webp" alt="List of apps available after uploading Brave">
+          <div class="article-image-caption">Figure 11: Applications list showing deployed applications with branding</div>
+        </div>
+
+        <h3>Client-Side Application Availability</h3>
+        <p>
+          Verify that enrolled clients can see the deployed applications in their Company Portal instance.
+        </p>
+        <div class="article-image-container">
+          <img src="../attachments/App Deploy via Company Portal-1790913624755.webp" alt="App available for installation in client">
+          <div class="article-image-caption">Figure 12: Application available for installation on managed device</div>
+        </div>
+
+        <h3>Application Ready for Installation</h3>
+        <p>
+          Applications display with full details, including custom logos and descriptions, ready for end-user installation.
+        </p>
+        <div class="article-image-container">
+          <img src="../attachments/App Deploy via Company Portal-1790913653851.webp" alt="App details showing the uploaded logo and ready to use after installation">
+          <div class="article-image-caption">Figure 13: Application details with custom branding ready for installation</div>
+        </div>
+
+        <div class="highlight-box">
+          <strong>Best Practice:</strong> Create security groups by department or function (e.g., "Sales Team", "IT Department", "Finance") to streamline application deployment and ensure users receive only the applications they need.
+        </div>
+
+        <h2>Key Takeaways</h2>
+        <ul>
+          <li><strong>Policy First:</strong> Establish device policies before deploying applications to ensure compliance and security baselines</li>
+          <li><strong>Company Portal as Hub:</strong> Leverage Company Portal as the single point for users to discover and install managed applications</li>
+          <li><strong>Security Groups:</strong> Use Azure AD security groups for targeted deployment to control application distribution</li>
+          <li><strong>Branding Matters:</strong> Upload custom logos and descriptions to improve application discoverability and user engagement</li>
+          <li><strong>Test First:</strong> Deploy test applications to verify the pipeline before rolling out production applications</li>
+          <li><strong>Compliance Tracking:</strong> Monitor deployment status and device compliance through Intune dashboards</li>
+        </ul>
+
+      </div>
+
+      <!-- Footer navigation -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 3rem 0;">
+        <a href="../index.html" class="btn btn-outline">
+          <i class="fa-solid fa-arrow-left"></i> All Articles
+        </a>
+      </div>
+    </article>
+  </main>
+
+    <footer>
+    <div class="container">
+      <p>© <span id="current-year">2026</span> Luis Baldera. Hosted securely with GitHub Pages.</p>
+      <p style="margin-top: 0.3rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim);">
+        Data Security • IAM • Microsoft Defender XDR • Entra ID • M365 Defensive Operations
+      </p>
+      <p style="margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.75rem;">
+        <a href="../../privacy.html" style="color: var(--accent-cyan); text-decoration: none;">Privacy Notice</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../script.js"></script>
+</body>
+</html>
