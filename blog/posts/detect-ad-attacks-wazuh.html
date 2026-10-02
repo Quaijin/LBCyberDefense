@@ -240,7 +240,7 @@
         <li><code>-accepteula</code>: Automatically accept the Sysinternals EULA</li>
       </ul>
 
-      <img src="../attachments/Detect AD attacks with Wazuh-1783304121075.webp" alt="Sysmon installation in PowerShell">
+      <img src="../attachments/Detect-AD-attacks-with-Wazuh-1783304121075.webp" alt="Sysmon installation in PowerShell">
       <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Sysmon installation command executed successfully</em></p>
 
       <h2><i class="fa-solid fa-search-plus"></i> Verification: Confirm Sysmon is Running</h2>
@@ -262,10 +262,10 @@ Running  Sysmon64         System Monitor</code></pre>
         <li>Confirm you see event logs with IDs like Event 1 (Process creation), Event 3 (Network connection), etc.</li>
       </ul>
 
-      <img src="../attachments/Detect AD attacks with Wazuh-1783304097675.webp" alt="Sysmon operational logs in Event Viewer">
+      <img src="../attachments/Detect-AD-attacks-with-Wazuh-1783304097675.webp" alt="Sysmon operational logs in Event Viewer">
       <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Sysmon events captured in Event Viewer's Operational channel</em></p>
 
-      <img src="../attachments/Detect AD attacks with Wazuh-1783304206582.webp" alt="Detailed Sysmon event logs">
+      <img src="../attachments/Detect-AD-attacks-with-Wazuh-1783304206582.webp" alt="Detailed Sysmon event logs">
       <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Detailed process creation and system events from Sysmon</em></p>
 
       <h2><i class="fa-solid fa-link"></i> Wazuh Agent Configuration</h2>
@@ -291,7 +291,7 @@ Running  Sysmon64         System Monitor</code></pre>
         <li><code>&lt;log_format&gt;</code>: Tells Wazuh this is an event channel (not a traditional text log)</li>
       </ul>
 
-      <img src="../attachments/Detect AD attacks with Wazuh-1783304613417.webp" alt="Wazuh agent configuration with Sysmon">
+      <img src="../attachments/Detect-AD-attacks-with-Wazuh-1783304613417.webp" alt="Wazuh agent configuration with Sysmon">
       <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Wazuh agent ossec.conf file updated with Sysmon monitoring</em></p>
 
       <h4>Step 3: Restart the Wazuh Service</h4>
@@ -310,7 +310,7 @@ Running  Sysmon64         System Monitor</code></pre>
       <h3>Create Observable Process Activity</h3>
       <p>Now let's generate some activity for Sysmon to capture and Wazuh to ingest. Open PowerShell and run commands that will be logged:</p>
 
-      <img src="../attachments/Detect AD attacks with Wazuh-1783304790079.webp" alt="PowerShell commands triggering Sysmon events">
+      <img src="../attachments/Detect-AD-attacks-with-Wazuh-1783304790079.webp" alt="PowerShell commands triggering Sysmon events">
       <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Executing PowerShell commands that trigger Sysmon event logging</em></p>
 
       <h3>Trigger a Process Creation Event</h3>
@@ -323,10 +323,10 @@ Running  Sysmon64         System Monitor</code></pre>
 
       <p>Check the Wazuh Manager to confirm it's receiving and processing Sysmon logs from your endpoint.</p>
 
-      <img src="../attachments/Detect AD attacks with Wazuh-1783306738300.webp" alt="Wazuh dashboard showing ingested Sysmon logs">
+      <img src="../attachments/Detect-AD-attacks-with-Wazuh-1783306738300.webp" alt="Wazuh dashboard showing ingested Sysmon logs">
       <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Wazuh dashboard displaying process creation events from Sysmon</em></p>
 
-      <img src="../attachments/Detect AD attacks with Wazuh-1783306769489.webp" alt="Detailed Sysmon event analysis in Wazuh">
+      <img src="../attachments/Detect-AD-attacks-with-Wazuh-1783306769489.webp" alt="Detailed Sysmon event analysis in Wazuh">
       <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;"><em>Detailed breakdown of a Sysmon Event ID 1 (Process Creation) in Wazuh</em></p>
 
       <h2><i class="fa-solid fa-shield-halved"></i> What's Next: Building Detection Rules</h2>
